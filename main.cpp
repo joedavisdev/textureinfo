@@ -53,16 +53,16 @@ public:
     return csv_string;
   };
 private:
-		enum
-		{
-			PVRv3 = 0x03525650, //!< PVR format v3 identifier
-			PVRv3Reversed = 0x50565203, //!< PVR format v3 reversed identifier
+    enum
+    {
+      PVRv3 = 0x03525650, //!< PVR format v3 identifier
+      PVRv3Reversed = 0x50565203, //!< PVR format v3 reversed identifier
 
-			// PVR header flags.
-			CompressedFlag = (1 << 0), //!< Compressed format flag
-			PremultipliedFlag = (1 << 1), //!< Premultiplied flag
-			SizeOfHeader = 52
-		};
+      // PVR header flags.
+      CompressedFlag = (1 << 0), //!< Compressed format flag
+      PremultipliedFlag = (1 << 1), //!< Premultiplied flag
+      SizeOfHeader = 52
+    };
     enum ColorSpaceEnum {
       lRGB,
       sRGB,
@@ -86,17 +86,17 @@ private:
       UnsignedFloat,
       NumVarTypes
     };
-		unsigned int flags;            //!< Various format flags.
-		pvr::PixelFormat pixelFormat;      //!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
-		ColorSpaceEnum colorSpace;
-		VariableTypeEnum channelType;
-		unsigned int height;           //!< Height of the texture.
-		unsigned int width;            //!< Width of the texture.
-		unsigned int depth;            //!< Depth of the texture. (Z-slices)
-		unsigned int numberOfSurfaces; //!< Number of members in a Texture Array.
-		unsigned int numberOfFaces;    //!< Number of faces in a Cube Map. Maybe be a value other than 6.
-		unsigned int mipMapCount;      //!< Number of MIP Maps in the texture - NB: Includes top level.
-		unsigned int metaDataSize;     //!< Size of the accompanying meta data.
+    unsigned int flags;            //!< Various format flags.
+    pvr::PixelFormat pixelFormat;      //!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
+    ColorSpaceEnum colorSpace;
+    VariableTypeEnum channelType;
+    unsigned int height;           //!< Height of the texture.
+    unsigned int width;            //!< Width of the texture.
+    unsigned int depth;            //!< Depth of the texture. (Z-slices)
+    unsigned int numberOfSurfaces; //!< Number of members in a Texture Array.
+    unsigned int numberOfFaces;    //!< Number of faces in a Cube Map. Maybe be a value other than 6.
+    unsigned int mipMapCount;      //!< Number of MIP Maps in the texture - NB: Includes top level.
+    unsigned int metaDataSize;     //!< Size of the accompanying meta data.
 };
 //*-------------------------------
 // main
