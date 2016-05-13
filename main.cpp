@@ -37,24 +37,23 @@ public:
   std::string ToCsvString() {
     std::string csv_string("");
     APPEND_CSVIFIED_VALUE(csv_string,this->flags)
-    APPEND_CSVIFIED_VALUE(csv_string,(int)this->pixelFormat.isIrregularFormat())
-    APPEND_CSVIFIED_VALUE(csv_string,this->pixelFormat.getPixelTypeId())
+    APPEND_CSVIFIED_VALUE(csv_string,(int)this->pixel_format.isIrregularFormat())
+    APPEND_CSVIFIED_VALUE(csv_string,this->pixel_format.getPixelTypeId())
     for(unsigned int index = 0; index < 8; index++)
-        APPEND_CSVIFIED_VALUE(csv_string,this->pixelFormat.getPixelTypeChar()[index])
-    APPEND_CSVIFIED_VALUE(csv_string,this->colorSpace)
-    APPEND_CSVIFIED_VALUE(csv_string,this->channelType)
+        APPEND_CSVIFIED_VALUE(csv_string,this->pixel_format.getPixelTypeChar()[index])
+    APPEND_CSVIFIED_VALUE(csv_string,this->color_space)
+    APPEND_CSVIFIED_VALUE(csv_string,this->channel_type)
     APPEND_CSVIFIED_VALUE(csv_string,this->height)
     APPEND_CSVIFIED_VALUE(csv_string,this->width)
     APPEND_CSVIFIED_VALUE(csv_string,this->depth)
-    APPEND_CSVIFIED_VALUE(csv_string,this->numberOfSurfaces)
-    APPEND_CSVIFIED_VALUE(csv_string,this->numberOfFaces)
-    APPEND_CSVIFIED_VALUE(csv_string,this->mipMapCount)
-    APPEND_CSVIFIED_VALUE(csv_string,this->metaDataSize)
+    APPEND_CSVIFIED_VALUE(csv_string,this->num_surfaces)
+    APPEND_CSVIFIED_VALUE(csv_string,this->num_faces)
+    APPEND_CSVIFIED_VALUE(csv_string,this->mip_map_count)
+    APPEND_CSVIFIED_VALUE(csv_string,this->meta_data_size)
     return csv_string;
   };
 private:
-    enum
-    {
+    enum {
       PVRv3 = 0x03525650, //!< PVR format v3 identifier
       PVRv3Reversed = 0x50565203, //!< PVR format v3 reversed identifier
 
@@ -86,17 +85,17 @@ private:
       UnsignedFloat,
       NumVarTypes
     };
-    unsigned int flags;            //!< Various format flags.
-    pvr::PixelFormat pixelFormat;      //!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
-    ColorSpaceEnum colorSpace;
-    VariableTypeEnum channelType;
-    unsigned int height;           //!< Height of the texture.
-    unsigned int width;            //!< Width of the texture.
-    unsigned int depth;            //!< Depth of the texture. (Z-slices)
-    unsigned int numberOfSurfaces; //!< Number of members in a Texture Array.
-    unsigned int numberOfFaces;    //!< Number of faces in a Cube Map. Maybe be a value other than 6.
-    unsigned int mipMapCount;      //!< Number of MIP Maps in the texture - NB: Includes top level.
-    unsigned int metaDataSize;     //!< Size of the accompanying meta data.
+    unsigned int flags;           //!< Various format flags.
+    pvr::PixelFormat pixel_format;//!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
+    ColorSpaceEnum color_space;
+    VariableTypeEnum channel_type;
+    unsigned int height;          //!< Height of the texture.
+    unsigned int width;           //!< Width of the texture.
+    unsigned int depth;           //!< Depth of the texture. (Z-slices)
+    unsigned int num_surfaces;    //!< Number of members in a Texture Array.
+    unsigned int num_faces;       //!< Number of faces in a Cube Map. Maybe be a value other than 6.
+    unsigned int mip_map_count;   //!< Number of MIP Maps in the texture - NB: Includes top level.
+    unsigned int meta_data_size;  //!< Size of the accompanying meta data.
 };
 //*-------------------------------
 // main
