@@ -6,6 +6,7 @@ project(${EXE_NAME})
 include_directories("${PROJECT_BINARY_DIR}" ${CMAKE_CURRENT_SOURCE_DIR}/external/pvrSdk)
 set (INC_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/external/pvrSdk/PixelFormat.h
+    textureinfo.h
 )
 set (SRC_FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/external/pvrSdk/PixelFormat.cpp
