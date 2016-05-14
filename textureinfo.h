@@ -7,7 +7,8 @@
 //*-------------------------------
 // Interfaces
 //-------------------------------*/
-class IPrint {
+class IHeader {
+  virtual bool LoadHeader(std::ifstream& file) = 0;
   virtual std::string ToString() = 0;
   virtual std::string ToCsvString() = 0;
 };
@@ -18,13 +19,18 @@ class IPrint {
 class BaseHeader {
   std::string file_name;
 };
-class PvrTexHeader: IPrint, BaseHeader {
+class PvrV3Header: IHeader, BaseHeader {
 public:
-  std::string ToString() {
+  virtual bool LoadHeader(std::ifstream& file) {
+    if(!file) return false;
+    
+    return true;
+  };
+  virtual std::string ToString() {
     assert(0);
     return "";
   };
-  std::string ToCsvString() {
+  virtual std::string ToCsvString() {
     std::string csv_string("");
     auto& impl(this->impl_);
     APPEND_CSVIFIED_VALUE(csv_string,impl.flags)
@@ -76,7 +82,7 @@ private:
       UnsignedFloat,
       NumVarTypes
     };
-    struct {
+    struct Impl {
       unsigned int flags;           //!< Various format flags.
       pvr::PixelFormat pixel_format;//!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
       ColorSpaceEnum color_space;
@@ -88,5 +94,6 @@ private:
       unsigned int num_faces;       //!< Number of faces in a Cube Map. May be a value other than 6.
       unsigned int mip_map_count;   //!< Number of MIP Maps in the texture - NB: Includes top level.
       unsigned int meta_data_size;  //!< Size of the accompanying meta data.
+      Impl() {memset(this, 0, sizeof(Impl));}
     }impl_;
 };
