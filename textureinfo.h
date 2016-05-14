@@ -15,7 +15,10 @@ class IPrint {
 //*-------------------------------
 // Classes
 //-------------------------------*/
-class PvrTexHeader: IPrint {
+class BaseHeader {
+  std::string file_name;
+};
+class PvrTexHeader: IPrint, BaseHeader {
 public:
   std::string ToString() {
     assert(0);
@@ -23,20 +26,21 @@ public:
   };
   std::string ToCsvString() {
     std::string csv_string("");
-    APPEND_CSVIFIED_VALUE(csv_string,this->flags)
-    APPEND_CSVIFIED_VALUE(csv_string,(int)this->pixel_format.isIrregularFormat())
-    APPEND_CSVIFIED_VALUE(csv_string,this->pixel_format.getPixelTypeId())
+    auto& impl(this->impl_);
+    APPEND_CSVIFIED_VALUE(csv_string,impl.flags)
+    APPEND_CSVIFIED_VALUE(csv_string,(int)impl.pixel_format.isIrregularFormat())
+    APPEND_CSVIFIED_VALUE(csv_string,impl.pixel_format.getPixelTypeId())
     for(unsigned int index = 0; index < 8; index++)
-        APPEND_CSVIFIED_VALUE(csv_string,this->pixel_format.getPixelTypeChar()[index])
-    APPEND_CSVIFIED_VALUE(csv_string,this->color_space)
-    APPEND_CSVIFIED_VALUE(csv_string,this->channel_type)
-    APPEND_CSVIFIED_VALUE(csv_string,this->height)
-    APPEND_CSVIFIED_VALUE(csv_string,this->width)
-    APPEND_CSVIFIED_VALUE(csv_string,this->depth)
-    APPEND_CSVIFIED_VALUE(csv_string,this->num_surfaces)
-    APPEND_CSVIFIED_VALUE(csv_string,this->num_faces)
-    APPEND_CSVIFIED_VALUE(csv_string,this->mip_map_count)
-    APPEND_CSVIFIED_VALUE(csv_string,this->meta_data_size)
+        APPEND_CSVIFIED_VALUE(csv_string,impl.pixel_format.getPixelTypeChar()[index])
+    APPEND_CSVIFIED_VALUE(csv_string,impl.color_space)
+    APPEND_CSVIFIED_VALUE(csv_string,impl.channel_type)
+    APPEND_CSVIFIED_VALUE(csv_string,impl.height)
+    APPEND_CSVIFIED_VALUE(csv_string,impl.width)
+    APPEND_CSVIFIED_VALUE(csv_string,impl.depth)
+    APPEND_CSVIFIED_VALUE(csv_string,impl.num_surfaces)
+    APPEND_CSVIFIED_VALUE(csv_string,impl.num_faces)
+    APPEND_CSVIFIED_VALUE(csv_string,impl.mip_map_count)
+    APPEND_CSVIFIED_VALUE(csv_string,impl.meta_data_size)
     return csv_string;
   };
 private:
@@ -72,15 +76,17 @@ private:
       UnsignedFloat,
       NumVarTypes
     };
-    unsigned int flags;           //!< Various format flags.
-    pvr::PixelFormat pixel_format;//!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
-    ColorSpaceEnum color_space;
-    VariableTypeEnum channel_type;
-    unsigned int height;          //!< Height of the texture.
-    unsigned int width;           //!< Width of the texture.
-    unsigned int depth;           //!< Depth of the texture. (Z-slices)
-    unsigned int num_surfaces;    //!< Number of members in a Texture Array.
-    unsigned int num_faces;       //!< Number of faces in a Cube Map. Maybe be a value other than 6.
-    unsigned int mip_map_count;   //!< Number of MIP Maps in the texture - NB: Includes top level.
-    unsigned int meta_data_size;  //!< Size of the accompanying meta data.
+    struct {
+      unsigned int flags;           //!< Various format flags.
+      pvr::PixelFormat pixel_format;//!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
+      ColorSpaceEnum color_space;
+      VariableTypeEnum channel_type;
+      unsigned int height;          //!< Height of the texture.
+      unsigned int width;           //!< Width of the texture.
+      unsigned int depth;           //!< Depth of the texture. (Z-slices)
+      unsigned int num_surfaces;    //!< Number of members in a Texture Array.
+      unsigned int num_faces;       //!< Number of faces in a Cube Map. May be a value other than 6.
+      unsigned int mip_map_count;   //!< Number of MIP Maps in the texture - NB: Includes top level.
+      unsigned int meta_data_size;  //!< Size of the accompanying meta data.
+    }impl_;
 };
