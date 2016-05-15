@@ -150,7 +150,7 @@ public:
 	channel bitrate combination). I.e. returns true if the format is any of the formats described in the supported
 	"compressed" formats enumeration.
 	*************************************************************************************************************/
-	uint8 isIrregularFormat()
+	uint8 isIrregularFormat() const
 	{
 		return m_format.Part.High == 0;
 	}
