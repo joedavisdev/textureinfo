@@ -23,7 +23,6 @@ public:
   virtual bool LoadHeader(std::ifstream& file, std::string& file_name) {
     if(!file) return false;
     std::uint32_t pvr_version;
-    file.seekg(0,std::ios_base::seekdir::beg);
     file.read(reinterpret_cast<char*>(&pvr_version), sizeof pvr_version);
     if(pvr_version == PvrV3Header::PVRv3) {}
     else if(pvr_version == PvrV3Header::PVRv3Reversed) {
@@ -35,7 +34,7 @@ public:
       return false;
     }
     file.read(reinterpret_cast<char*>(&this->impl_),
-      sizeof(this->impl_) - sizeof(pvr_version));
+      sizeof(this->impl_));
     file.close();
     return true;
   };
@@ -98,6 +97,7 @@ private:
       std::uint64_t data;
       std::uint8_t chars[8];
     };
+	#pragma pack(4)
     struct Impl {
       std::uint32_t flags;          //!< Various format flags.
       std::uint64_t pixel_format; //!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
