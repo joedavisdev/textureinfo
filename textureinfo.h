@@ -1,14 +1,12 @@
 #include <string>
 #include <assert.h>
 
-#include "PixelFormat.h"
-
 #define APPEND_CSVIFIED_VALUE(string__,value__) string__.append(std::to_string(value__) + ',');
 //*-------------------------------
 // Interfaces
 //-------------------------------*/
 class IHeader {
-  virtual bool LoadHeader(std::ifstream& file) = 0;
+  virtual bool LoadHeader(std::ifstream& file, std::string& file_name) = 0;
   virtual std::string ToString() = 0;
   virtual std::string ToCsvString() = 0;
 };
@@ -17,13 +15,28 @@ class IHeader {
 // Classes
 //-------------------------------*/
 class BaseHeader {
+protected:
   std::string file_name;
 };
 class PvrV3Header: IHeader, BaseHeader {
 public:
-  virtual bool LoadHeader(std::ifstream& file) {
+  virtual bool LoadHeader(std::ifstream& file, std::string& file_name) {
     if(!file) return false;
-    
+    std::uint32_t pvr_version;
+    file.seekg(0,std::ios_base::seekdir::beg);
+    file.read(reinterpret_cast<char*>(&pvr_version), sizeof pvr_version);
+    if(pvr_version == PvrV3Header::PVRv3) {}
+    else if(pvr_version == PvrV3Header::PVRv3Reversed) {
+      printf("DEBUG: %s endianess does not matches host\n",file_name.c_str());
+      assert(0); // TODO: Handle endianess
+    }
+    else {
+      printf("DEBUG: %s is not a valid PVR v3 file\n",file_name.c_str());
+      return false;
+    }
+    file.read(reinterpret_cast<char*>(&this->impl_),
+      sizeof(this->impl_) - sizeof(pvr_version));
+    file.close();
     return true;
   };
   virtual std::string ToString() {
@@ -32,12 +45,11 @@ public:
   };
   virtual std::string ToCsvString() {
     std::string csv_string("");
-    auto& impl(this->impl_);
+    const auto& impl(this->impl_);
+    csv_string.append(this->file_name);csv_string.append(",");
     APPEND_CSVIFIED_VALUE(csv_string,impl.flags)
-    APPEND_CSVIFIED_VALUE(csv_string,(int)impl.pixel_format.isIrregularFormat())
-    APPEND_CSVIFIED_VALUE(csv_string,impl.pixel_format.getPixelTypeId())
     for(unsigned int index = 0; index < 8; index++)
-        APPEND_CSVIFIED_VALUE(csv_string,impl.pixel_format.getPixelTypeChar()[index])
+//        APPEND_CSVIFIED_VALUE(csv_string,impl.pixel_format.chars[index]) //TODO: FIX!
     APPEND_CSVIFIED_VALUE(csv_string,impl.color_space)
     APPEND_CSVIFIED_VALUE(csv_string,impl.channel_type)
     APPEND_CSVIFIED_VALUE(csv_string,impl.height)
@@ -82,18 +94,22 @@ private:
       UnsignedFloat,
       NumVarTypes
     };
+    union PixelFormatImpl {
+      std::uint64_t data;
+      std::uint8_t chars[8];
+    };
     struct Impl {
-      unsigned int flags;           //!< Various format flags.
-      pvr::PixelFormat pixel_format;//!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
-      ColorSpaceEnum color_space;
-      VariableTypeEnum channel_type;
-      unsigned int height;          //!< Height of the texture.
-      unsigned int width;           //!< Width of the texture.
-      unsigned int depth;           //!< Depth of the texture. (Z-slices)
-      unsigned int num_surfaces;    //!< Number of members in a Texture Array.
-      unsigned int num_faces;       //!< Number of faces in a Cube Map. May be a value other than 6.
-      unsigned int mip_map_count;   //!< Number of MIP Maps in the texture - NB: Includes top level.
-      unsigned int meta_data_size;  //!< Size of the accompanying meta data.
+      std::uint32_t flags;          //!< Various format flags.
+      std::uint64_t pixel_format; //!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
+      std::uint32_t color_space;
+      std::uint32_t channel_type;
+      std::uint32_t height;         //!< Height of the texture.
+      std::uint32_t width;          //!< Width of the texture.
+      std::uint32_t depth;          //!< Depth of the texture. (Z-slices)
+      std::uint32_t num_surfaces;   //!< Number of members in a Texture Array.
+      std::uint32_t num_faces;      //!< Number of faces in a Cube Map. May be a value other than 6.
+      std::uint32_t mip_map_count;  //!< Number of MIP Maps in the texture - NB: Includes top level.
+      std::uint32_t meta_data_size; //!< Size of the accompanying meta data.
       Impl() {memset(this, 0, sizeof(Impl));}
     }impl_;
 };
