@@ -33,9 +33,9 @@ public:
       printf("DEBUG: %s is not a valid PVR v3 file\n",file_name.c_str());
       return false;
     }
-    file.read(reinterpret_cast<char*>(&this->impl_),
-      sizeof(this->impl_));
+    file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
     file.close();
+    this->file_name = file_name;
     return true;
   };
   virtual std::string ToString() {
@@ -100,7 +100,7 @@ private:
 	#pragma pack(4)
     struct Impl {
       std::uint32_t flags;          //!< Various format flags.
-      std::uint64_t pixel_format; //!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
+      std::uint64_t pixel_format;   //!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
       std::uint32_t color_space;
       std::uint32_t channel_type;
       std::uint32_t height;         //!< Height of the texture.
