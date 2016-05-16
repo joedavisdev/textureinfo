@@ -14,11 +14,7 @@ class IHeader {
 //*-------------------------------
 // Classes
 //-------------------------------*/
-class BaseHeader {
-protected:
-  std::string file_name;
-};
-class PvrV3Header: IHeader, BaseHeader {
+class PvrV3Header: IHeader {
 public:
   virtual bool LoadHeader(std::ifstream& file, std::string& file_name) {
     if(!file) return false;
@@ -35,7 +31,6 @@ public:
     }
     file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
     file.close();
-    this->file_name = file_name;
     return true;
   };
   virtual std::string ToString() {
@@ -45,7 +40,6 @@ public:
   virtual std::string ToCsvString() {
     std::string csv_string("");
     const auto& impl(this->impl_);
-    csv_string.append(this->file_name);csv_string.append(",");
     APPEND_CSVIFIED_VALUE(csv_string,impl.flags)
     for(unsigned int index = 0; index < 8; index++)
 //        APPEND_CSVIFIED_VALUE(csv_string,impl.pixel_format.chars[index]) //TODO: FIX!
