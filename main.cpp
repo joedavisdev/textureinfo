@@ -25,17 +25,16 @@ int main (int argc, char *argv[]) {
     if(ext_name == "pvr") {
       std::ifstream file(file_name, std::ifstream::binary);
       if(!file.is_open()) {
-        printf("WARNING: Unable to open %s\n", file_name.c_str());
+        printf("ERROR: Unable to open %s\n", file_name.c_str());
         continue;
       }
-      std::uint32_t pvr_version;
-      file.read(reinterpret_cast<char*>(&pvr_version), sizeof pvr_version);
-      if(pvr_version == 0x03525650)
-        printf("DEBUG: %s endianess matches host\n",file_name.c_str());
-      else if(pvr_version == 0x50565203)
-        printf("DEBUG: %s endianess does not matches host\n",file_name.c_str());
-      else
-        printf("DEBUG: %s is not a valid PVR v3 file\n",file_name.c_str());
+      PvrV3Header pvr_header;
+      if(pvr_header.LoadHeader(file, file_name) ) {
+        printf("====================\n");
+        printf("%s\n",file_name.c_str());
+        printf("====================\n");
+        printf("%s",pvr_header.ToString().c_str());
+      }
     }
   }
 }
