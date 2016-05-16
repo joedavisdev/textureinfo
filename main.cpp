@@ -28,8 +28,10 @@ int main (int argc, char *argv[]) {
         printf("ERROR: Unable to open %s\n", file_name.c_str());
         continue;
       }
-      PvrV3Header pvr_header;pvr_header.LoadHeader(file, file_name);
-      printf("%s: %s\n",file_name.c_str(), pvr_header.ToCsvString().c_str());
+      PvrV3Header pvr_header;
+      if(pvr_header.LoadHeader(file, file_name) ) {
+        printf("%s: %s\n",file_name.c_str(), pvr_header.ToCsvString().c_str());
+      }
     }
   }
 }
