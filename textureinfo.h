@@ -18,6 +18,50 @@ class IHeader {
 //*-------------------------------
 // Classes
 //-------------------------------*/
+namespace PVRCompressedPixelFormat {
+enum Enum
+{
+  PVRTCI_2bpp_RGB,
+  PVRTCI_2bpp_RGBA,
+  PVRTCI_4bpp_RGB,
+  PVRTCI_4bpp_RGBA,
+  PVRTCII_2bpp,
+  PVRTCII_4bpp,
+  ETC1,
+  DXT1,
+  DXT2,
+  DXT3,
+  DXT4,
+  DXT5,
+
+  //These formats are identical to some DXT formats.
+  BC1 = DXT1,
+  BC2 = DXT3,
+  BC3 = DXT5,
+
+  //These are currently unsupported:
+  BC4,
+  BC5,
+  BC6,
+  BC7,
+
+  //These are supported
+  UYVY,
+  YUY2,
+  BW1bpp,
+  SharedExponentR9G9B9E5,
+  RGBG8888,
+  GRGB8888,
+  ETC2_RGB,
+  ETC2_RGBA,
+  ETC2_RGB_A1,
+  EAC_R11,
+  EAC_RG11,
+
+  //Invalid value
+  NumCompressedPFs
+};
+};
 std::vector<std::string> PvrV3HeaderVarNames {
   "Flags",
   "Channel name [0]",
@@ -85,7 +129,7 @@ public:
     const auto& impl(this->impl_);
     APPEND_CSVIFIED_VALUE(csv_string,impl.flags)
     for(unsigned int index = 0; index < 8; index++)
-        APPEND_CSVIFIED_VALUE(csv_string,impl_.pixel_format.u8[index])
+        APPEND_CSVIFIED_VALUE(csv_string,impl.pixel_format.u8[index])
     APPEND_CSVIFIED_VALUE(csv_string,impl.color_space)
     APPEND_CSVIFIED_VALUE(csv_string,impl.channel_type)
     APPEND_CSVIFIED_VALUE(csv_string,impl.height)
@@ -135,7 +179,7 @@ private:
       std::uint32_t u32[2];
       std::uint8_t u8[8];
     };
-	#pragma pack(4)
+    #pragma pack(4)
     struct Impl {
       std::uint32_t flags;          //!< Various format flags.
       PixelFormatUnion pixel_format;//!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
