@@ -132,7 +132,7 @@ private:
     };
     union PixelFormatUnion {
       std::uint64_t u64;
-      std::uint32_t u32;
+      std::uint32_t u32[2];
       std::uint8_t u8[8];
     };
 	#pragma pack(4)
