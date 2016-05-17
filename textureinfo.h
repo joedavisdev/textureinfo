@@ -61,14 +61,14 @@ public:
     std::string out_string("");
     const auto& impl(this->impl_);
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[0],impl.flags)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1],impl.pixel_format.chars[0])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[2],impl.pixel_format.chars[1])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[3],impl.pixel_format.chars[2])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[4],impl.pixel_format.chars[3])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[5],impl.pixel_format.chars[4])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[6],impl.pixel_format.chars[5])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[7],impl.pixel_format.chars[6])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[8],impl.pixel_format.chars[7])
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1],impl.pixel_format.u8[0])
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[2],impl.pixel_format.u8[1])
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[3],impl.pixel_format.u8[2])
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[4],impl.pixel_format.u8[3])
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[5],impl.pixel_format.u8[4])
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[6],impl.pixel_format.u8[5])
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[7],impl.pixel_format.u8[6])
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[8],impl.pixel_format.u8[7])
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[9],impl.color_space)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[10],impl.channel_type)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[11],impl.height)
@@ -85,7 +85,7 @@ public:
     const auto& impl(this->impl_);
     APPEND_CSVIFIED_VALUE(csv_string,impl.flags)
     for(unsigned int index = 0; index < 8; index++)
-        APPEND_CSVIFIED_VALUE(csv_string,impl_.pixel_format.chars[index]) //TODO: FIX!
+        APPEND_CSVIFIED_VALUE(csv_string,impl_.pixel_format.u8[index])
     APPEND_CSVIFIED_VALUE(csv_string,impl.color_space)
     APPEND_CSVIFIED_VALUE(csv_string,impl.channel_type)
     APPEND_CSVIFIED_VALUE(csv_string,impl.height)
@@ -130,14 +130,15 @@ private:
       UnsignedFloat,
       NumVarTypes
     };
-    union PixelFormatImpl {
-      std::uint64_t data;
-      std::uint8_t chars[8];
+    union PixelFormatUnion {
+      std::uint64_t u64;
+      std::uint32_t u32;
+      std::uint8_t u8[8];
     };
 	#pragma pack(4)
     struct Impl {
       std::uint32_t flags;          //!< Various format flags.
-      PixelFormatImpl pixel_format; //!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
+      PixelFormatUnion pixel_format;//!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
       std::uint32_t color_space;
       std::uint32_t channel_type;
       std::uint32_t height;         //!< Height of the texture.
