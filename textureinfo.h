@@ -1,9 +1,12 @@
 #include <string>
 #include <vector>
+#include <unordered_map>
 #include <assert.h>
 
+#define APPEND_FORMATTED_ROW_RAW(string__,value_name__,value__) \
+  string__.append(value_name__ + ": " + value__ + "\n");
 #define APPEND_FORMATTED_ROW(string__,value_name__,value__) \
-  string__.append(value_name__ + ": " + std::to_string(value__) + "\n");
+  APPEND_FORMATTED_ROW_RAW(string__,value_name__,std::to_string(value__))
 #define APPEND_CSVIFIED_VALUE(string__,value__) \
   string__.append(std::to_string(value__) + ',');
 //*-------------------------------
@@ -62,6 +65,39 @@ enum Enum
   NumCompressedPFs
 };
 };
+#define PVR_COMPRESSED_FORMAT_NAME(enum__) {PVRCompressedPixelFormat::enum__,#enum__}
+std::unordered_map<unsigned int, std::string> PVRCompressedPixelFormatNames {
+PVR_COMPRESSED_FORMAT_NAME(PVRTCI_2bpp_RGB),
+PVR_COMPRESSED_FORMAT_NAME(PVRTCI_2bpp_RGBA),
+PVR_COMPRESSED_FORMAT_NAME(PVRTCI_4bpp_RGB),
+PVR_COMPRESSED_FORMAT_NAME(PVRTCI_4bpp_RGBA),
+PVR_COMPRESSED_FORMAT_NAME(PVRTCII_2bpp),
+PVR_COMPRESSED_FORMAT_NAME(PVRTCII_4bpp),
+PVR_COMPRESSED_FORMAT_NAME(ETC1),
+PVR_COMPRESSED_FORMAT_NAME(DXT1),
+PVR_COMPRESSED_FORMAT_NAME(DXT2),
+PVR_COMPRESSED_FORMAT_NAME(DXT3),
+PVR_COMPRESSED_FORMAT_NAME(DXT4),
+PVR_COMPRESSED_FORMAT_NAME(DXT5),
+PVR_COMPRESSED_FORMAT_NAME(BC1),
+PVR_COMPRESSED_FORMAT_NAME(BC2),
+PVR_COMPRESSED_FORMAT_NAME(BC3),
+PVR_COMPRESSED_FORMAT_NAME(BC4),
+PVR_COMPRESSED_FORMAT_NAME(BC5),
+PVR_COMPRESSED_FORMAT_NAME(BC6),
+PVR_COMPRESSED_FORMAT_NAME(BC7),
+PVR_COMPRESSED_FORMAT_NAME(UYVY),
+PVR_COMPRESSED_FORMAT_NAME(YUY2),
+PVR_COMPRESSED_FORMAT_NAME(BW1bpp),
+PVR_COMPRESSED_FORMAT_NAME(SharedExponentR9G9B9E5),
+PVR_COMPRESSED_FORMAT_NAME(RGBG8888),
+PVR_COMPRESSED_FORMAT_NAME(GRGB8888),
+PVR_COMPRESSED_FORMAT_NAME(ETC2_RGB),
+PVR_COMPRESSED_FORMAT_NAME(ETC2_RGBA),
+PVR_COMPRESSED_FORMAT_NAME(ETC2_RGB_A1),
+PVR_COMPRESSED_FORMAT_NAME(EAC_R11),
+PVR_COMPRESSED_FORMAT_NAME(EAC_RG11)
+};
 std::vector<std::string> PvrV3HeaderVarNames {
   "Flags",
   "Channel name [0]",
@@ -105,14 +141,12 @@ public:
     std::string out_string("");
     const auto& impl(this->impl_);
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[0],impl.flags)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1],impl.pixel_format.u8[0])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[2],impl.pixel_format.u8[1])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[3],impl.pixel_format.u8[2])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[4],impl.pixel_format.u8[3])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[5],impl.pixel_format.u8[4])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[6],impl.pixel_format.u8[5])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[7],impl.pixel_format.u8[6])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[8],impl.pixel_format.u8[7])
+    if(impl.pixel_format.u32[1] == 0)
+      APPEND_FORMATTED_ROW_RAW(out_string,std::string("Compressed format"),
+        PVRCompressedPixelFormatNames[impl.pixel_format.u8[0]])
+    else
+      for(unsigned int index = 0; index < 8; index++)
+        APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1+index],impl.pixel_format.u8[index])
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[9],impl.color_space)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[10],impl.channel_type)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[11],impl.height)
