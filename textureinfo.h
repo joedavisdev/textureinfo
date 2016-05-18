@@ -14,8 +14,11 @@
   string__.append(std::to_string(value__) + ',');
 #define STRING_ENUM_PAIR(namespace__,enum__) {namespace__::enum__,#enum__}
 
-
+//*-------------------------------
+// Constants
+//-------------------------------*/
 static const char c_null_character = '-';
+
 //*-------------------------------
 // Interfaces
 //-------------------------------*/
