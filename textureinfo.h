@@ -12,6 +12,7 @@
   APPEND_FORMATTED_ROW_RAW(string__,value_name__,std::to_string(value__))
 #define APPEND_CSVIFIED_VALUE(string__,value__) \
   string__.append(std::to_string(value__) + ',');
+#define STRING_ENUM_PAIR(namespace__,enum__) {namespace__::enum__,#enum__}
 
 //*-------------------------------
 // Interfaces
@@ -69,38 +70,37 @@ enum Enum
   NumCompressedPFs
 };
 };
-#define PVR_COMPRESSED_FORMAT_NAME(enum__) {PVRCompressedPixelFormat::enum__,#enum__}
-std::multimap<unsigned int, std::string> PVRCompressedPixelFormatNames {
-PVR_COMPRESSED_FORMAT_NAME(PVRTCI_2bpp_RGB),
-PVR_COMPRESSED_FORMAT_NAME(PVRTCI_2bpp_RGBA),
-PVR_COMPRESSED_FORMAT_NAME(PVRTCI_4bpp_RGB),
-PVR_COMPRESSED_FORMAT_NAME(PVRTCI_4bpp_RGBA),
-PVR_COMPRESSED_FORMAT_NAME(PVRTCII_2bpp),
-PVR_COMPRESSED_FORMAT_NAME(PVRTCII_4bpp),
-PVR_COMPRESSED_FORMAT_NAME(ETC1),
-PVR_COMPRESSED_FORMAT_NAME(DXT1),
-PVR_COMPRESSED_FORMAT_NAME(DXT2),
-PVR_COMPRESSED_FORMAT_NAME(DXT3),
-PVR_COMPRESSED_FORMAT_NAME(DXT4),
-PVR_COMPRESSED_FORMAT_NAME(DXT5),
-PVR_COMPRESSED_FORMAT_NAME(BC1),
-PVR_COMPRESSED_FORMAT_NAME(BC2),
-PVR_COMPRESSED_FORMAT_NAME(BC3),
-PVR_COMPRESSED_FORMAT_NAME(BC4),
-PVR_COMPRESSED_FORMAT_NAME(BC5),
-PVR_COMPRESSED_FORMAT_NAME(BC6),
-PVR_COMPRESSED_FORMAT_NAME(BC7),
-PVR_COMPRESSED_FORMAT_NAME(UYVY),
-PVR_COMPRESSED_FORMAT_NAME(YUY2),
-PVR_COMPRESSED_FORMAT_NAME(BW1bpp),
-PVR_COMPRESSED_FORMAT_NAME(SharedExponentR9G9B9E5),
-PVR_COMPRESSED_FORMAT_NAME(RGBG8888),
-PVR_COMPRESSED_FORMAT_NAME(GRGB8888),
-PVR_COMPRESSED_FORMAT_NAME(ETC2_RGB),
-PVR_COMPRESSED_FORMAT_NAME(ETC2_RGBA),
-PVR_COMPRESSED_FORMAT_NAME(ETC2_RGB_A1),
-PVR_COMPRESSED_FORMAT_NAME(EAC_R11),
-PVR_COMPRESSED_FORMAT_NAME(EAC_RG11)
+std::multimap<unsigned int,std::string> PVRCompressedPixelFormatNames {
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCI_2bpp_RGB),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCI_2bpp_RGBA),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCI_4bpp_RGB),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCI_4bpp_RGBA),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCII_2bpp),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCII_4bpp),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,ETC1),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,DXT1),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,DXT2),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,DXT3),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,DXT4),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,DXT5),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC1),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC2),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC3),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC4),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC5),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC6),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC7),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,UYVY),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,YUY2),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,BW1bpp),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,SharedExponentR9G9B9E5),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,RGBG8888),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,GRGB8888),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,ETC2_RGB),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,ETC2_RGBA),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,ETC2_RGB_A1),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,EAC_R11),
+STRING_ENUM_PAIR(PVRCompressedPixelFormat,EAC_RG11)
 };
 std::vector<std::string> PvrV3HeaderVarNames {
   "Flags",
@@ -163,8 +163,10 @@ public:
         else
           APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1+index],impl.pixel_format.u8[index])
     }
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[9],impl.color_space)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[10],impl.channel_type)
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[9],
+      ColorSpaceNames.find(impl.color_space)->second)
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[10],
+      VariableTypeNames.find(impl.channel_type)->second)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[11],impl.height)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[12],impl.width)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[13],impl.depth)
@@ -206,6 +208,10 @@ private:
       sRGB,
       NumSpaces
     };
+    std::multimap<unsigned int,std::string> ColorSpaceNames {
+      STRING_ENUM_PAIR(PvrV3Header,lRGB),
+      STRING_ENUM_PAIR(PvrV3Header,sRGB)
+    };
     enum VariableTypeEnum {
       UnsignedByteNorm,
       SignedByteNorm,
@@ -223,6 +229,23 @@ private:
       Float = SignedFloat,
       UnsignedFloat,
       NumVarTypes
+    };
+    std::multimap<unsigned int,std::string> VariableTypeNames {
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedByteNorm),
+      STRING_ENUM_PAIR(PvrV3Header,SignedByteNorm),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedByte),
+      STRING_ENUM_PAIR(PvrV3Header,SignedByte),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedShortNorm),
+      STRING_ENUM_PAIR(PvrV3Header,SignedShortNorm),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedShort),
+      STRING_ENUM_PAIR(PvrV3Header,SignedShort),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedIntegerNorm),
+      STRING_ENUM_PAIR(PvrV3Header,SignedIntegerNorm),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedInteger),
+      STRING_ENUM_PAIR(PvrV3Header,SignedInteger),
+      STRING_ENUM_PAIR(PvrV3Header,SignedFloat),
+      STRING_ENUM_PAIR(PvrV3Header,Float),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedFloat)
     };
     union PixelFormatUnion {
       std::uint64_t u64;
