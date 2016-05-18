@@ -14,6 +14,8 @@
   string__.append(std::to_string(value__) + ',');
 #define STRING_ENUM_PAIR(namespace__,enum__) {namespace__::enum__,#enum__}
 
+
+static const char c_null_character = '-';
 //*-------------------------------
 // Interfaces
 //-------------------------------*/
@@ -104,6 +106,7 @@ STRING_ENUM_PAIR(PVRCompressedPixelFormat,EAC_RG11)
 };
 std::vector<std::string> PvrV3HeaderVarNames {
   "Flags",
+  "Compressed format",
   "Channel name [0]",
   "Channel name [1]",
   "Channel name [2]",
@@ -145,35 +148,39 @@ public:
     std::string out_string("");
     const auto& impl(this->impl_);
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[0],impl.flags)
-    if(impl.pixel_format.u32[1] == 0)
-      APPEND_FORMATTED_ROW_RAW(out_string,std::string("Compressed format"),
+    if(impl.pixel_format.u32[1] == 0) {
+      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1],
         PVRCompressedPixelFormatNames.find(impl.pixel_format.u8[0])->second)
+      for(unsigned int index = 0; index < 8; index++)
+        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],c_null_character)
+      }
     else {
+      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1],c_null_character)
       // Channel names
       for(unsigned int index = 0; index < 4; index++) {
         // Convert unsigned int pulled from the header into a literal character
-        char value('-');
+        char value(c_null_character);
         std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
-        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1+index],value)
+        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],value)
       }
       // Bits per-pixel
       for(unsigned int index = 4; index < 8; index++)
         if(impl.pixel_format.u8[index]==0)
-          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1+index],'-')
+          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],c_null_character)
         else
-          APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1+index],impl.pixel_format.u8[index])
+          APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[2+index],impl.pixel_format.u8[index])
     }
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[9],
-      ColorSpaceNames.find(impl.color_space)->second)
     APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[10],
+      ColorSpaceNames.find(impl.color_space)->second)
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[11],
       VariableTypeNames.find(impl.channel_type)->second)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[11],impl.height)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[12],impl.width)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[13],impl.depth)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[14],impl.num_surfaces)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[15],impl.num_faces)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[16],impl.mip_map_count)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[17],impl.meta_data_size)
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[12],impl.height)
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[13],impl.width)
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[14],impl.depth)
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[15],impl.num_surfaces)
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[16],impl.num_faces)
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[17],impl.mip_map_count)
+    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[18],impl.meta_data_size)
     return out_string;
   };
   virtual std::string ToCsvString() {
