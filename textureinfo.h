@@ -4,20 +4,25 @@
 #include <assert.h>
 
 //*-------------------------------
+// Global functions
+//-------------------------------*/
+static const void AppendCsvifiedRow(std::string& property, const std::string& value) {
+  property.append(value + ',');
+}
+
+//*-------------------------------
 // Macros
 //-------------------------------*/
 #define APPEND_FORMATTED_ROW_RAW(string__,value_name__,value__) \
   string__.append(value_name__ + ": " + value__ + "\n");
 #define APPEND_FORMATTED_ROW(string__,value_name__,value__) \
   APPEND_FORMATTED_ROW_RAW(string__,value_name__,std::to_string(value__))
-#define APPEND_CSVIFIED_VALUE(string__,value__) \
-  string__.append(std::to_string(value__) + ',');
 #define STRING_ENUM_PAIR(namespace__,enum__) {namespace__::enum__,#enum__}
 
 //*-------------------------------
 // Constants
 //-------------------------------*/
-static const char c_null_character = '-';
+static const std::string c_empty_string = "-";
 
 //*-------------------------------
 // Interfaces
@@ -155,21 +160,21 @@ public:
       APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1],
         PVRCompressedPixelFormatNames.find(impl.pixel_format.u8[0])->second)
       for(unsigned int index = 0; index < 8; index++)
-        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],c_null_character)
+        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],c_empty_string)
       }
     else {
-      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1],c_null_character)
+      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1],c_empty_string)
       // Channel names
       for(unsigned int index = 0; index < 4; index++) {
         // Convert unsigned int pulled from the header into a literal character
-        char value(c_null_character);
+        char value(c_empty_string[0]);
         std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
         APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],value)
       }
       // Bits per-pixel
       for(unsigned int index = 4; index < 8; index++)
         if(impl.pixel_format.u8[index]==0)
-          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],c_null_character)
+          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],c_empty_string)
         else
           APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[2+index],impl.pixel_format.u8[index])
     }
@@ -189,18 +194,38 @@ public:
   virtual std::string ToCsvString() {
     std::string csv_string("");
     const auto& impl(this->impl_);
-    APPEND_CSVIFIED_VALUE(csv_string,impl.flags)
-    for(unsigned int index = 0; index < 8; index++)
-        APPEND_CSVIFIED_VALUE(csv_string,impl.pixel_format.u8[index])
-    APPEND_CSVIFIED_VALUE(csv_string,impl.color_space)
-    APPEND_CSVIFIED_VALUE(csv_string,impl.channel_type)
-    APPEND_CSVIFIED_VALUE(csv_string,impl.height)
-    APPEND_CSVIFIED_VALUE(csv_string,impl.width)
-    APPEND_CSVIFIED_VALUE(csv_string,impl.depth)
-    APPEND_CSVIFIED_VALUE(csv_string,impl.num_surfaces)
-    APPEND_CSVIFIED_VALUE(csv_string,impl.num_faces)
-    APPEND_CSVIFIED_VALUE(csv_string,impl.mip_map_count)
-    APPEND_CSVIFIED_VALUE(csv_string,impl.meta_data_size)
+    AppendCsvifiedRow(csv_string,std::to_string(impl.flags));
+    if(impl.pixel_format.u32[1] == 0) {
+      AppendCsvifiedRow(csv_string,
+        PVRCompressedPixelFormatNames.find(impl.pixel_format.u8[0])->second);
+      for(unsigned int index = 0; index < 8; index++)
+        AppendCsvifiedRow(csv_string,c_empty_string);
+      }
+    else {
+      AppendCsvifiedRow(csv_string,c_empty_string);
+      // Channel names
+      for(unsigned int index = 0; index < 4; index++) {
+        // Convert unsigned int pulled from the header into a literal character
+        char value(c_empty_string[0]);
+        std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
+        AppendCsvifiedRow(csv_string,std::to_string(value));
+      }
+      // Bits per-pixel
+      for(unsigned int index = 4; index < 8; index++)
+        if(impl.pixel_format.u8[index]==0)
+          AppendCsvifiedRow(csv_string,c_empty_string);
+        else
+          AppendCsvifiedRow(csv_string,std::to_string(impl.pixel_format.u8[index]));
+    }
+    AppendCsvifiedRow(csv_string,std::to_string(impl.color_space));
+    AppendCsvifiedRow(csv_string,std::to_string(impl.channel_type));
+    AppendCsvifiedRow(csv_string,std::to_string(impl.height));
+    AppendCsvifiedRow(csv_string,std::to_string(impl.width));
+    AppendCsvifiedRow(csv_string,std::to_string(impl.depth));
+    AppendCsvifiedRow(csv_string,std::to_string(impl.num_surfaces));
+    AppendCsvifiedRow(csv_string,std::to_string(impl.num_faces));
+    AppendCsvifiedRow(csv_string,std::to_string(impl.mip_map_count));
+    AppendCsvifiedRow(csv_string,std::to_string(impl.meta_data_size));
     return csv_string;
   };
 private:
