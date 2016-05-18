@@ -3,12 +3,16 @@
 #include <map>
 #include <assert.h>
 
+//*-------------------------------
+// Macros
+//-------------------------------*/
 #define APPEND_FORMATTED_ROW_RAW(string__,value_name__,value__) \
   string__.append(value_name__ + ": " + value__ + "\n");
 #define APPEND_FORMATTED_ROW(string__,value_name__,value__) \
   APPEND_FORMATTED_ROW_RAW(string__,value_name__,std::to_string(value__))
 #define APPEND_CSVIFIED_VALUE(string__,value__) \
   string__.append(std::to_string(value__) + ',');
+
 //*-------------------------------
 // Interfaces
 //-------------------------------*/
@@ -144,9 +148,21 @@ public:
     if(impl.pixel_format.u32[1] == 0)
       APPEND_FORMATTED_ROW_RAW(out_string,std::string("Compressed format"),
         PVRCompressedPixelFormatNames.find(impl.pixel_format.u8[0])->second)
-    else
-      for(unsigned int index = 0; index < 8; index++)
-        APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1+index],impl.pixel_format.u8[index])
+    else {
+      // Channel names
+      for(unsigned int index = 0; index < 4; index++) {
+        // Convert unsigned int pulled from the header into a literal character
+        char value('-');
+        std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
+        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1+index],value)
+      }
+      // Bits per-pixel
+      for(unsigned int index = 4; index < 8; index++)
+        if(impl.pixel_format.u8[index]==0)
+          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1+index],'-')
+        else
+          APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1+index],impl.pixel_format.u8[index])
+    }
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[9],impl.color_space)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[10],impl.channel_type)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[11],impl.height)
