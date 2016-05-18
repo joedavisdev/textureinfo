@@ -165,7 +165,8 @@ public:
     }
     APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[9],
       ColorSpaceNames.find(impl.color_space)->second)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[10],impl.channel_type)
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[10],
+      VariableTypeNames.find(impl.channel_type)->second)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[11],impl.height)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[12],impl.width)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[13],impl.depth)
@@ -228,6 +229,23 @@ private:
       Float = SignedFloat,
       UnsignedFloat,
       NumVarTypes
+    };
+    std::multimap<unsigned int,std::string> VariableTypeNames {
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedByteNorm),
+      STRING_ENUM_PAIR(PvrV3Header,SignedByteNorm),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedByte),
+      STRING_ENUM_PAIR(PvrV3Header,SignedByte),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedShortNorm),
+      STRING_ENUM_PAIR(PvrV3Header,SignedShortNorm),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedShort),
+      STRING_ENUM_PAIR(PvrV3Header,SignedShort),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedIntegerNorm),
+      STRING_ENUM_PAIR(PvrV3Header,SignedIntegerNorm),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedInteger),
+      STRING_ENUM_PAIR(PvrV3Header,SignedInteger),
+      STRING_ENUM_PAIR(PvrV3Header,SignedFloat),
+      STRING_ENUM_PAIR(PvrV3Header,Float),
+      STRING_ENUM_PAIR(PvrV3Header,UnsignedFloat)
     };
     union PixelFormatUnion {
       std::uint64_t u64;
