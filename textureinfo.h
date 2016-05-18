@@ -1,6 +1,6 @@
 #include <string>
 #include <vector>
-#include <unordered_map>
+#include <map>
 #include <assert.h>
 
 #define APPEND_FORMATTED_ROW_RAW(string__,value_name__,value__) \
@@ -66,7 +66,7 @@ enum Enum
 };
 };
 #define PVR_COMPRESSED_FORMAT_NAME(enum__) {PVRCompressedPixelFormat::enum__,#enum__}
-std::unordered_map<unsigned int, std::string> PVRCompressedPixelFormatNames {
+std::multimap<unsigned int, std::string> PVRCompressedPixelFormatNames {
 PVR_COMPRESSED_FORMAT_NAME(PVRTCI_2bpp_RGB),
 PVR_COMPRESSED_FORMAT_NAME(PVRTCI_2bpp_RGBA),
 PVR_COMPRESSED_FORMAT_NAME(PVRTCI_4bpp_RGB),
@@ -143,7 +143,7 @@ public:
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[0],impl.flags)
     if(impl.pixel_format.u32[1] == 0)
       APPEND_FORMATTED_ROW_RAW(out_string,std::string("Compressed format"),
-        PVRCompressedPixelFormatNames[impl.pixel_format.u8[0]])
+        PVRCompressedPixelFormatNames.find(impl.pixel_format.u8[0])->second)
     else
       for(unsigned int index = 0; index < 8; index++)
         APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1+index],impl.pixel_format.u8[index])
