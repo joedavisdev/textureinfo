@@ -30,9 +30,9 @@ int main (int argc, char *argv[]) {
       }
       PvrV3Header pvr_header;
       if(pvr_header.LoadHeader(file, file_name) ) {
-        printf("====================\n");
+        printf("========================================\n");
         printf("%s\n",file_name.c_str());
-        printf("====================\n");
+        printf("========================================\n");
         printf("%s",pvr_header.ToString().c_str());
       }
     }

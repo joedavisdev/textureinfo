@@ -1,11 +1,18 @@
 #include <string>
 #include <vector>
+#include <map>
 #include <assert.h>
 
+//*-------------------------------
+// Macros
+//-------------------------------*/
+#define APPEND_FORMATTED_ROW_RAW(string__,value_name__,value__) \
+  string__.append(value_name__ + ": " + value__ + "\n");
 #define APPEND_FORMATTED_ROW(string__,value_name__,value__) \
-  string__.append(value_name__ + ": " + std::to_string(value__) + "\n");
+  APPEND_FORMATTED_ROW_RAW(string__,value_name__,std::to_string(value__))
 #define APPEND_CSVIFIED_VALUE(string__,value__) \
   string__.append(std::to_string(value__) + ',');
+
 //*-------------------------------
 // Interfaces
 //-------------------------------*/
@@ -18,16 +25,93 @@ class IHeader {
 //*-------------------------------
 // Classes
 //-------------------------------*/
+namespace PVRCompressedPixelFormat {
+enum Enum
+{
+  PVRTCI_2bpp_RGB,
+  PVRTCI_2bpp_RGBA,
+  PVRTCI_4bpp_RGB,
+  PVRTCI_4bpp_RGBA,
+  PVRTCII_2bpp,
+  PVRTCII_4bpp,
+  ETC1,
+  DXT1,
+  DXT2,
+  DXT3,
+  DXT4,
+  DXT5,
+
+  //These formats are identical to some DXT formats.
+  BC1 = DXT1,
+  BC2 = DXT3,
+  BC3 = DXT5,
+
+  //These are currently unsupported:
+  BC4,
+  BC5,
+  BC6,
+  BC7,
+
+  //These are supported
+  UYVY,
+  YUY2,
+  BW1bpp,
+  SharedExponentR9G9B9E5,
+  RGBG8888,
+  GRGB8888,
+  ETC2_RGB,
+  ETC2_RGBA,
+  ETC2_RGB_A1,
+  EAC_R11,
+  EAC_RG11,
+
+  //Invalid value
+  NumCompressedPFs
+};
+};
+#define PVR_COMPRESSED_FORMAT_NAME(enum__) {PVRCompressedPixelFormat::enum__,#enum__}
+std::multimap<unsigned int, std::string> PVRCompressedPixelFormatNames {
+PVR_COMPRESSED_FORMAT_NAME(PVRTCI_2bpp_RGB),
+PVR_COMPRESSED_FORMAT_NAME(PVRTCI_2bpp_RGBA),
+PVR_COMPRESSED_FORMAT_NAME(PVRTCI_4bpp_RGB),
+PVR_COMPRESSED_FORMAT_NAME(PVRTCI_4bpp_RGBA),
+PVR_COMPRESSED_FORMAT_NAME(PVRTCII_2bpp),
+PVR_COMPRESSED_FORMAT_NAME(PVRTCII_4bpp),
+PVR_COMPRESSED_FORMAT_NAME(ETC1),
+PVR_COMPRESSED_FORMAT_NAME(DXT1),
+PVR_COMPRESSED_FORMAT_NAME(DXT2),
+PVR_COMPRESSED_FORMAT_NAME(DXT3),
+PVR_COMPRESSED_FORMAT_NAME(DXT4),
+PVR_COMPRESSED_FORMAT_NAME(DXT5),
+PVR_COMPRESSED_FORMAT_NAME(BC1),
+PVR_COMPRESSED_FORMAT_NAME(BC2),
+PVR_COMPRESSED_FORMAT_NAME(BC3),
+PVR_COMPRESSED_FORMAT_NAME(BC4),
+PVR_COMPRESSED_FORMAT_NAME(BC5),
+PVR_COMPRESSED_FORMAT_NAME(BC6),
+PVR_COMPRESSED_FORMAT_NAME(BC7),
+PVR_COMPRESSED_FORMAT_NAME(UYVY),
+PVR_COMPRESSED_FORMAT_NAME(YUY2),
+PVR_COMPRESSED_FORMAT_NAME(BW1bpp),
+PVR_COMPRESSED_FORMAT_NAME(SharedExponentR9G9B9E5),
+PVR_COMPRESSED_FORMAT_NAME(RGBG8888),
+PVR_COMPRESSED_FORMAT_NAME(GRGB8888),
+PVR_COMPRESSED_FORMAT_NAME(ETC2_RGB),
+PVR_COMPRESSED_FORMAT_NAME(ETC2_RGBA),
+PVR_COMPRESSED_FORMAT_NAME(ETC2_RGB_A1),
+PVR_COMPRESSED_FORMAT_NAME(EAC_R11),
+PVR_COMPRESSED_FORMAT_NAME(EAC_RG11)
+};
 std::vector<std::string> PvrV3HeaderVarNames {
   "Flags",
-  "Pixel format [0]",
-  "Pixel format [1]",
-  "Pixel format [2]",
-  "Pixel format [3]",
-  "Pixel format [4]",
-  "Pixel format [5]",
-  "Pixel format [6]",
-  "Pixel format [7]",
+  "Channel name [0]",
+  "Channel name [1]",
+  "Channel name [2]",
+  "Channel name [3]",
+  "Bits per-pixel [0]",
+  "Bits per-pixel [1]",
+  "Bits per-pixel [2]",
+  "Bits per-pixel [3]",
   "Color space",
   "Channel type",
   "Height",
@@ -61,14 +145,24 @@ public:
     std::string out_string("");
     const auto& impl(this->impl_);
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[0],impl.flags)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1],impl.pixel_format.chars[0])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[2],impl.pixel_format.chars[1])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[3],impl.pixel_format.chars[2])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[4],impl.pixel_format.chars[3])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[5],impl.pixel_format.chars[4])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[6],impl.pixel_format.chars[5])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[7],impl.pixel_format.chars[6])
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[8],impl.pixel_format.chars[7])
+    if(impl.pixel_format.u32[1] == 0)
+      APPEND_FORMATTED_ROW_RAW(out_string,std::string("Compressed format"),
+        PVRCompressedPixelFormatNames.find(impl.pixel_format.u8[0])->second)
+    else {
+      // Channel names
+      for(unsigned int index = 0; index < 4; index++) {
+        // Convert unsigned int pulled from the header into a literal character
+        char value('-');
+        std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
+        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1+index],value)
+      }
+      // Bits per-pixel
+      for(unsigned int index = 4; index < 8; index++)
+        if(impl.pixel_format.u8[index]==0)
+          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1+index],'-')
+        else
+          APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[1+index],impl.pixel_format.u8[index])
+    }
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[9],impl.color_space)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[10],impl.channel_type)
     APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[11],impl.height)
@@ -85,7 +179,7 @@ public:
     const auto& impl(this->impl_);
     APPEND_CSVIFIED_VALUE(csv_string,impl.flags)
     for(unsigned int index = 0; index < 8; index++)
-        APPEND_CSVIFIED_VALUE(csv_string,impl_.pixel_format.chars[index]) //TODO: FIX!
+        APPEND_CSVIFIED_VALUE(csv_string,impl.pixel_format.u8[index])
     APPEND_CSVIFIED_VALUE(csv_string,impl.color_space)
     APPEND_CSVIFIED_VALUE(csv_string,impl.channel_type)
     APPEND_CSVIFIED_VALUE(csv_string,impl.height)
@@ -130,14 +224,15 @@ private:
       UnsignedFloat,
       NumVarTypes
     };
-    union PixelFormatImpl {
-      std::uint64_t data;
-      std::uint8_t chars[8];
+    union PixelFormatUnion {
+      std::uint64_t u64;
+      std::uint32_t u32[2];
+      std::uint8_t u8[8];
     };
-	#pragma pack(4)
+    #pragma pack(4)
     struct Impl {
       std::uint32_t flags;          //!< Various format flags.
-      PixelFormatImpl pixel_format; //!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
+      PixelFormatUnion pixel_format;//!< The pixel format, 8cc value storing the 4 channel identifiers and their respective sizes.
       std::uint32_t color_space;
       std::uint32_t channel_type;
       std::uint32_t height;         //!< Height of the texture.
