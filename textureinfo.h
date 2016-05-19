@@ -28,7 +28,7 @@ static const std::string c_empty_string = "-";
 // Interfaces
 //-------------------------------*/
 class IHeader {
-  virtual bool LoadHeader(std::ifstream& file, std::string& file_name) = 0;
+  virtual bool LoadHeader(std::ifstream& file, std::string& error_string) = 0;
   virtual std::string ToString() = 0;
   virtual std::string ToCsvString() = 0;
 };
@@ -135,17 +135,17 @@ std::vector<std::string> PvrV3HeaderVarNames {
 };
 class PvrV3Header: IHeader {
 public:
-  virtual bool LoadHeader(std::ifstream& file, std::string& file_name) {
+  virtual bool LoadHeader(std::ifstream& file, std::string& error_string) {
     if(!file) return false;
     std::uint32_t pvr_version;
     file.read(reinterpret_cast<char*>(&pvr_version), sizeof pvr_version);
     if(pvr_version == PvrV3Header::PVRv3) {}
     else if(pvr_version == PvrV3Header::PVRv3Reversed) {
-      printf("DEBUG: %s endianess does not matches host\n",file_name.c_str());
-      assert(0); // TODO: Handle endianess
+      error_string = "Endianess does not matches host";
+      return false;
     }
     else {
-      printf("DEBUG: %s is not a valid PVR v3 file\n",file_name.c_str());
+      error_string = "Not a valid PVR v3 file";
       return false;
     }
     file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
