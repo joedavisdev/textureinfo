@@ -210,7 +210,7 @@ public:
         // Convert unsigned int pulled from the header into a literal character
         char value(c_empty_string[0]);
         std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
-        AppendCsvifiedRow(csv_string,std::to_string(value));
+        AppendCsvifiedRow(csv_string,std::string(&value));
       }
       // Bits per-pixel
       for(unsigned int index = 4; index < 8; index++)
