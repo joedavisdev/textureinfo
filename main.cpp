@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 
+#include <cstring>
 #include <stdint.h>
 
 #include "textureinfo.h"
