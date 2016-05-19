@@ -1,6 +1,8 @@
 #include <string>
 #include <vector>
 #include <map>
+
+#include <cstring>
 #include <assert.h>
 
 //*-------------------------------
