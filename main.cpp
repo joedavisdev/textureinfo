@@ -43,6 +43,16 @@ static void PrintHeaderInfo(const std::string& file_name, const std::string& hea
   PrintDivider();
   std::cout << header_info << std::endl;
 }
+static void PrintHelp() {
+  std::cout << "usage: textureinfo ";
+  for(const auto&parameter:ParameterInfo)
+    std::cout << "[" << std::get<0>(parameter) << "] ";
+  std::cout << "..." << std::endl << std::endl;
+  std::cout << "descriptions:" << std::endl;
+  for(const auto&parameter:ParameterInfo)
+    std::cout << "\t" << std::get<0>(parameter) << ": "
+      << std::get<1>(parameter) << std::endl;
+}
 
 //*-------------------------------
 // main
@@ -52,6 +62,11 @@ int main (int argc, char *argv[]) {
   // Loop through args
   for(unsigned int index = 1; index < argc; index++) {
     // Flags
+    if(strcmp(argv[index], "/?") == 0 ||
+    strcmp(argv[index], "-h") == 0 ||
+    strcmp(argv[index], "--help") == 0) {
+      PrintHelp();
+    }
     if(argv[index] == std::get<0>(ParameterInfo[0])) {
       s_parameters.print_csv = true;
       continue;
