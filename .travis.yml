@@ -1,6 +1,25 @@
 language: cpp
 script: ./build.sh
-compiler:
-  - clang
-  - gcc
-
+matrix:
+  include:
+    # Linux Clang
+    - os: linux
+      compiler: clang
+      env: BUILD_TYPE='Release'
+    - os: linux
+      compiler: clang
+      env: BUILD_TYPE='Debug'
+    # Linux GCC
+    - os: linux
+      compiler: gcc
+      env: BUILD_TYPE='Release'
+    - os: linux
+      compiler: gcc
+      env: BUILD_TYPE='Debug'
+    # OS X
+    - os: osx
+      compiler: clang
+      env: BUILD_TYPE='Debug'
+    - os: osx
+      compiler: clang
+      env: BUILD_TYPE='Release'
