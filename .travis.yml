@@ -1,7 +1,7 @@
 language: cpp
 script:
   - cmake --version
-  - ./build.sh
+  - ./.travis_build.sh $TRAVIS_OS_NAME
 matrix:
   include:
     # Linux Clang
