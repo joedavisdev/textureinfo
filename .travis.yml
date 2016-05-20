@@ -31,8 +31,10 @@ matrix:
       env: BUILD_TYPE='Debug'
     # OS X
     - os: osx
+      osx_image: xcode7
       compiler: clang
       env: BUILD_TYPE='Debug'
     - os: osx
+      osx_image: xcode7
       compiler: clang
       env: BUILD_TYPE='Release'
