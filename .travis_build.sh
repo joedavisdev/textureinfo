@@ -1,3 +1,4 @@
+set -e
 # Do some setup
 CMAKE_BIN=
 if [ "$1" == "linux" ]; then
