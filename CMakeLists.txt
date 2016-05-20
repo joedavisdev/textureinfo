@@ -1,4 +1,4 @@
-cmake_minimum_required (VERSION 3.3.1)
+cmake_minimum_required (VERSION 2.8)
 
 set(EXE_NAME textureinfo)
 project(${EXE_NAME})
