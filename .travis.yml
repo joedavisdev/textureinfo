@@ -19,9 +19,17 @@ matrix:
     # Linux GCC
     - os: linux
       compiler: gcc
+      addons: &gcc48
+        apt:
+         sources: ['ubuntu-toolchain-r-test']
+         packages: ['g++-4.8']
       env: BUILD_TYPE='Release'
     - os: linux
       compiler: gcc
+      addons: &gcc48
+        apt:
+         sources: ['ubuntu-toolchain-r-test']
+         packages: ['g++-4.8']
       env: BUILD_TYPE='Debug'
     # OS X
     - os: osx
