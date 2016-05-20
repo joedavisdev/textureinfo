@@ -8,4 +8,4 @@ tar -xf cmake-3.5.2-Linux-x86_64.tar.gz"
 CMAKE_BIN=~/cmake-3.5.2-Linux-x86_64/bin/./cmake
 fi
 # Run the CMake build commands
-echo ./build.sh $CMAKE_BIN
+./build.sh $CMAKE_BIN
