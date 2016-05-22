@@ -19,8 +19,7 @@ static struct Parameters {
   Parameters():print_csv(false){}
 }s_parameters;
 
-static const
-std::vector<std::tuple<std::string, std::string>> ParameterInfo {
+const std::vector<std::tuple<std::string, std::string>> ParameterInfo {
 {"--csv","Write header information to a CSV file (calling directory)"}
 };
 
