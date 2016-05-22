@@ -85,7 +85,7 @@ int main (int argc, char *argv[]) {
     if(!csv_pvr_output.is_open()) {
       printf("ERROR: Unable to open %s",s_defaults.csv_pvr_name.c_str());
     }
-    for(auto& variable_name : PvrV3HeaderVarNames)
+    for(auto& variable_name : PvrV3Props::var_names)
       csv_pvr_output << variable_name << ',';
     csv_pvr_output << std::endl;
   }
