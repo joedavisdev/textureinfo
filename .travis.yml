@@ -1,4 +1,5 @@
 language: cpp
+sudo: required
 script:
   - cmake --version
   - bash .travis_build.sh "$TRAVIS_OS_NAME"
