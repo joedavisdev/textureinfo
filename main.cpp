@@ -1,7 +1,7 @@
 #include <string>
 #include <iostream>
 #include <fstream>
-#include <tuple>
+#include <utility>
 
 #include <cstring>
 #include <stdint.h>
@@ -21,7 +21,7 @@ static struct Parameters {
 }s_parameters;
 
 static const
-std::vector<std::tuple<std::string, std::string>> ParameterInfo {
+std::vector<std::pair<std::string, std::string>> ParameterInfo {
 {"--csv","Write header information to a CSV file (calling directory)"}
 };
 
