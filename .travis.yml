@@ -5,13 +5,6 @@ script:
   - bash .travis_build.sh "$TRAVIS_OS_NAME"
 matrix:
   include:
-    # Linux Clang
-    - os: linux
-      compiler: clang
-      env: BUILD_TYPE='Release'
-    - os: linux
-      compiler: clang
-      env: BUILD_TYPE='Debug'
     # Linux GCC
     - os: linux
       compiler: gcc
