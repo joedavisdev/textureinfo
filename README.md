@@ -1,9 +1,18 @@
 # textureinfo
-[![Build Status](https://travis-ci.org/joedavisdev/textureinfo.svg?branch=develop)](https://travis-ci.org/joedavisdev/textureinfo)
 
 A simple command-line utility for inspecting texture file header data. Currently supports the following container formats:
 
 * PVR (v3)
+
+# Build health
+
+| Branch  | Status |
+| ------: | ------:|
+| master  | [![Build Status: master]](https://travis-ci.org/joedavisdev/textureinfo)  |
+| develop | [![Build Status: develop]](https://travis-ci.org/joedavisdev/textureinfo) |
+
+[Build Status: master]:https://travis-ci.org/joedavisdev/textureinfo.svg?branch=master
+[Build Status: develop]:https://travis-ci.org/joedavisdev/textureinfo.svg?branch=develop
 
 # Building
 
