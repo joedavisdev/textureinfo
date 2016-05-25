@@ -38,102 +38,97 @@ class IHeader {
 //*-------------------------------
 // Classes
 //-------------------------------*/
-namespace PVRCompressedPixelFormat {
-enum Enum
-{
-  PVRTCI_2bpp_RGB,
-  PVRTCI_2bpp_RGBA,
-  PVRTCI_4bpp_RGB,
-  PVRTCI_4bpp_RGBA,
-  PVRTCII_2bpp,
-  PVRTCII_4bpp,
-  ETC1,
-  DXT1,
-  DXT2,
-  DXT3,
-  DXT4,
-  DXT5,
-
-  //These formats are identical to some DXT formats.
-  BC1 = DXT1,
-  BC2 = DXT3,
-  BC3 = DXT5,
-
-  //These are currently unsupported:
-  BC4,
-  BC5,
-  BC6,
-  BC7,
-
-  //These are supported
-  UYVY,
-  YUY2,
-  BW1bpp,
-  SharedExponentR9G9B9E5,
-  RGBG8888,
-  GRGB8888,
-  ETC2_RGB,
-  ETC2_RGBA,
-  ETC2_RGB_A1,
-  EAC_R11,
-  EAC_RG11,
-
-  //Invalid value
-  NumCompressedPFs
-};
-};
-std::multimap<unsigned int,std::string> PVRCompressedPixelFormatNames {
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCI_2bpp_RGB),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCI_2bpp_RGBA),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCI_4bpp_RGB),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCI_4bpp_RGBA),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCII_2bpp),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,PVRTCII_4bpp),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,ETC1),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,DXT1),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,DXT2),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,DXT3),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,DXT4),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,DXT5),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC1),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC2),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC3),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC4),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC5),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC6),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,BC7),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,UYVY),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,YUY2),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,BW1bpp),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,SharedExponentR9G9B9E5),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,RGBG8888),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,GRGB8888),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,ETC2_RGB),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,ETC2_RGBA),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,ETC2_RGB_A1),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,EAC_R11),
-STRING_ENUM_PAIR(PVRCompressedPixelFormat,EAC_RG11)
-};
-std::vector<std::string> PvrV3HeaderVarNames {
-  "Flags",
-  "Compressed format",
-  "Channel name [0]",
-  "Channel name [1]",
-  "Channel name [2]",
-  "Channel name [3]",
-  "Bits per-pixel [0]",
-  "Bits per-pixel [1]",
-  "Bits per-pixel [2]",
-  "Bits per-pixel [3]",
-  "Color space",
-  "Channel type",
-  "Height",
-  "Width",
-  "Depth",
-  "Number of surfaces",
-  "Number of faces",
-  "Number of MIP maps",
-  "Meta data size"
+namespace PvrV3Props {
+  enum CompressedFormat {
+    PVRTCI_2bpp_RGB,
+    PVRTCI_2bpp_RGBA,
+    PVRTCI_4bpp_RGB,
+    PVRTCI_4bpp_RGBA,
+    PVRTCII_2bpp,
+    PVRTCII_4bpp,
+    ETC1,
+    DXT1,
+    DXT2,
+    DXT3,
+    DXT4,
+    DXT5,
+    //These formats are identical to some DXT formats.
+    BC1 = DXT1,
+    BC2 = DXT3,
+    BC3 = DXT5,
+    //These are currently unsupported:
+    BC4,
+    BC5,
+    BC6,
+    BC7,
+    //These are supported
+    UYVY,
+    YUY2,
+    BW1bpp,
+    SharedExponentR9G9B9E5,
+    RGBG8888,
+    GRGB8888,
+    ETC2_RGB,
+    ETC2_RGBA,
+    ETC2_RGB_A1,
+    EAC_R11,
+    EAC_RG11,
+    //Invalid value
+    NumCompressedPFs
+  };
+  std::multimap<unsigned int,std::string> compressed_format_names {
+  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_2bpp_RGB),
+  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_2bpp_RGBA),
+  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_4bpp_RGB),
+  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_4bpp_RGBA),
+  STRING_ENUM_PAIR(CompressedFormat,PVRTCII_2bpp),
+  STRING_ENUM_PAIR(CompressedFormat,PVRTCII_4bpp),
+  STRING_ENUM_PAIR(CompressedFormat,ETC1),
+  STRING_ENUM_PAIR(CompressedFormat,DXT1),
+  STRING_ENUM_PAIR(CompressedFormat,DXT2),
+  STRING_ENUM_PAIR(CompressedFormat,DXT3),
+  STRING_ENUM_PAIR(CompressedFormat,DXT4),
+  STRING_ENUM_PAIR(CompressedFormat,DXT5),
+  STRING_ENUM_PAIR(CompressedFormat,BC1),
+  STRING_ENUM_PAIR(CompressedFormat,BC2),
+  STRING_ENUM_PAIR(CompressedFormat,BC3),
+  STRING_ENUM_PAIR(CompressedFormat,BC4),
+  STRING_ENUM_PAIR(CompressedFormat,BC5),
+  STRING_ENUM_PAIR(CompressedFormat,BC6),
+  STRING_ENUM_PAIR(CompressedFormat,BC7),
+  STRING_ENUM_PAIR(CompressedFormat,UYVY),
+  STRING_ENUM_PAIR(CompressedFormat,YUY2),
+  STRING_ENUM_PAIR(CompressedFormat,BW1bpp),
+  STRING_ENUM_PAIR(CompressedFormat,SharedExponentR9G9B9E5),
+  STRING_ENUM_PAIR(CompressedFormat,RGBG8888),
+  STRING_ENUM_PAIR(CompressedFormat,GRGB8888),
+  STRING_ENUM_PAIR(CompressedFormat,ETC2_RGB),
+  STRING_ENUM_PAIR(CompressedFormat,ETC2_RGBA),
+  STRING_ENUM_PAIR(CompressedFormat,ETC2_RGB_A1),
+  STRING_ENUM_PAIR(CompressedFormat,EAC_R11),
+  STRING_ENUM_PAIR(CompressedFormat,EAC_RG11)
+  };
+  std::vector<std::string> var_names {
+    "Flags",
+    "Compressed format",
+    "Channel name [0]",
+    "Channel name [1]",
+    "Channel name [2]",
+    "Channel name [3]",
+    "Bits per-pixel [0]",
+    "Bits per-pixel [1]",
+    "Bits per-pixel [2]",
+    "Bits per-pixel [3]",
+    "Color space",
+    "Channel type",
+    "Height",
+    "Width",
+    "Depth",
+    "Number of surfaces",
+    "Number of faces",
+    "Number of MIP maps",
+    "Meta data size"
+  };
 };
 class PvrV3Header: IHeader {
 public:
@@ -157,40 +152,40 @@ public:
   virtual std::string ToString() {
     std::string out_string("");
     const auto& impl(this->impl_);
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[0],impl.flags)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[0],impl.flags)
     if(impl.pixel_format.u32[1] == 0) {
-      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1],
-        PVRCompressedPixelFormatNames.find(impl.pixel_format.u8[0])->second)
+      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[1],
+        PvrV3Props::compressed_format_names.find(impl.pixel_format.u8[0])->second)
       for(unsigned int index = 0; index < 8; index++)
-        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],c_empty_string)
+        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[2+index],c_empty_string)
       }
     else {
-      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[1],c_empty_string)
+      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[1],c_empty_string)
       // Channel names
       for(unsigned int index = 0; index < 4; index++) {
         // Convert unsigned int pulled from the header into a literal character
         char value(c_empty_string[0]);
         std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
-        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],value)
+        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[2+index],value)
       }
       // Bits per-pixel
       for(unsigned int index = 4; index < 8; index++)
         if(impl.pixel_format.u8[index]==0)
-          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[2+index],c_empty_string)
+          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[2+index],c_empty_string)
         else
-          APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[2+index],impl.pixel_format.u8[index])
+          APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[2+index],impl.pixel_format.u8[index])
     }
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[10],
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[10],
       ColorSpaceNames.find(impl.color_space)->second)
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3HeaderVarNames[11],
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[11],
       VariableTypeNames.find(impl.channel_type)->second)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[12],impl.height)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[13],impl.width)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[14],impl.depth)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[15],impl.num_surfaces)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[16],impl.num_faces)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[17],impl.mip_map_count)
-    APPEND_FORMATTED_ROW(out_string,PvrV3HeaderVarNames[18],impl.meta_data_size)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[12],impl.height)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[13],impl.width)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[14],impl.depth)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[15],impl.num_surfaces)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[16],impl.num_faces)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[17],impl.mip_map_count)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[18],impl.meta_data_size)
     return out_string;
   };
   virtual std::string ToCsvString() {
@@ -199,7 +194,7 @@ public:
     AppendCsvifiedRow(csv_string,std::to_string(impl.flags));
     if(impl.pixel_format.u32[1] == 0) {
       AppendCsvifiedRow(csv_string,
-        PVRCompressedPixelFormatNames.find(impl.pixel_format.u8[0])->second);
+        PvrV3Props::compressed_format_names.find(impl.pixel_format.u8[0])->second);
       for(unsigned int index = 0; index < 8; index++)
         AppendCsvifiedRow(csv_string,c_empty_string);
       }
