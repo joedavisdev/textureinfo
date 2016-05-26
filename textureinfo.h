@@ -215,11 +215,11 @@ namespace PvrLegacyProps {
     ApiMGL
   };
   enum Flags {
-    MIP_MAP         = (1 << 8)  // Texture has MIP Map levels
-    BUMP_MAP        = (1 << 10) // Texture has normals encoded for a bump map
-    CUBE_MAP        = (1 << 12) // Texture is a cubemap/skybox
-    VOLUME_TEXTURE  = (1 << 14) // Texture is a 3D texture
-    HAS_ALPHA       = (1 << 15) // Texture has transparency
+    MIP_MAP         = (1 << 8),  // Texture has MIP Map levels
+    BUMP_MAP        = (1 << 10), // Texture has normals encoded for a bump map
+    CUBE_MAP        = (1 << 12), // Texture is a cubemap/skybox
+    VOLUME_TEXTURE  = (1 << 14), // Texture is a 3D texture
+    HAS_ALPHA       = (1 << 15), // Texture has transparency
     VERTICAL_FLIP   = (1 << 16) // Texture is vertically flipped
   };
   const std::uint32_t kPixelTypeMask = 0xff;
