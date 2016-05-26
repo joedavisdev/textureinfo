@@ -222,11 +222,11 @@ namespace PvrLegacyProps {
     HAS_ALPHA       = (1 << 15) // Texture has transparency
     VERTICAL_FLIP   = (1 << 16) // Texture is vertically flipped
   };
-  const std::uint32_t c_pixel_type_mask = 0xff;
+  const std::uint32_t kPixelTypeMask = 0xff;
   // The old PVR header identifier is the characters 'PVR!', V2 only. Usually ignored...
-  const std::uint32_t c_identifier_v2 = 0x21525650;
-  const std::uint32_t c_header_size_v1 = 44;
-  const std::uint32_t c_header_size_v2 = 52;
+  const std::uint32_t kIdentifierV2 = 0x21525650;
+  const std::uint32_t kHeaderSizeV1 = 44;
+  const std::uint32_t kHeaderSizeV2 = 52;
 }
 // PVR Version 1 & 2
 class PvrLegacyHeader: public IHeader {
