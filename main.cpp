@@ -105,6 +105,7 @@ int main (int argc, char *argv[]) {
           break;
         case Defaults::Types::PVRLegacy:
           column_titles = PvrLegacyProps::column_names;
+          break;
         default:
           assert(0);
           break;
