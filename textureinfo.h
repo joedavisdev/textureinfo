@@ -38,6 +38,38 @@ class IHeader {
 //*-------------------------------
 // Classes
 //-------------------------------*/
+namespace PvrLegacyProps {
+}
+// PVR Version 1 & 2
+class PvrLegacyHeader: public IHeader {
+public:
+  virtual bool LoadHeader(std::ifstream& file, std::string& error_string){assert(0);}
+  virtual std::string ToString(){assert(0);}
+  virtual std::string ToCsvString(){assert(0);}
+private:
+  #pragma pack(4)
+  struct ImplV1 {
+    std::uint32_t header_size;        //!< size of the structure
+    std::uint32_t height;             //!< height of surface to be created
+    std::uint32_t width;              //!< width of input surface
+    std::uint32_t mip_map_count;      //!< number of mip-map levels requested
+    std::uint32_t pixel_format_flags; //!< pixel format flags
+    std::uint32_t data_size;          //!< Size of the compress data
+    std::uint32_t bit_count;          //!< number of bits per pixel
+    std::uint32_t red_mask;           //!< mask for red bit
+    std::uint32_t green_mask;         //!< mask for green bits
+    std::uint32_t blue_mask;          //!< mask for blue bits
+    std::uint32_t alpha_mask;         //!< mask for alpha channel
+    ImplV1() {memset(this, 0, sizeof(ImplV1));}
+  }impl_v1_;
+  #pragma pack(4)
+  struct ImplV2 {
+    std::uint32_t magic_number; // magic number identifying pvr file
+    std::uint32_t num_surfaces; // Number of surfaces present in the pvr
+    ImplV2() {memset(this, 0, sizeof(ImplV2));}
+  }impl_v2_;
+};
+
 namespace PvrV3Props {
   enum CompressedFormat {
     PVRTCI_2bpp_RGB,
@@ -130,7 +162,7 @@ namespace PvrV3Props {
     "Meta data size"
   };
 };
-class PvrV3Header: IHeader {
+class PvrV3Header: public IHeader {
 public:
   virtual bool LoadHeader(std::ifstream& file, std::string& error_string) {
     if(!file) return false;
