@@ -20,6 +20,12 @@ static const void AppendCsvifiedRow(std::string& property, const std::string& va
 #define APPEND_FORMATTED_ROW(string__,value_name__,value__) \
   APPEND_FORMATTED_ROW_RAW(string__,value_name__,std::to_string(value__))
 #define STRING_ENUM_PAIR(namespace__,enum__) {namespace__::enum__,#enum__}
+#define HEADER_PRE_LOAD(file__) \
+  if(!file__) return false; \
+  file__.seekg(std::ios_base::beg);
+#define HEADER_POST_LOAD(file__) \
+  file__.close(); \
+  return true;
 
 //*-------------------------------
 // Constants
@@ -30,6 +36,7 @@ static const std::string c_empty_string = "-";
 // Interfaces
 //-------------------------------*/
 class IHeader {
+public:
   virtual bool LoadHeader(std::ifstream& file, std::string& error_string) = 0;
   virtual std::string ToString() = 0;
   virtual std::string ToCsvString() = 0;
@@ -227,17 +234,31 @@ namespace PvrLegacyProps {
   const std::uint32_t kIdentifierV2 = 0x21525650;
   const std::uint32_t kHeaderSizeV1 = 44;
   const std::uint32_t kHeaderSizeV2 = 52;
+  
+  std::vector<std::string> column_names {""};
 }
 // PVR Version 1 & 2
 class PvrLegacyHeader: public IHeader {
 public:
-  virtual bool LoadHeader(std::ifstream& file, std::string& error_string){assert(0);}
+  virtual bool LoadHeader(std::ifstream& file, std::string& error_string) {
+    HEADER_PRE_LOAD(file)
+    std::uint32_t pvr_version;
+    file.read(reinterpret_cast<char*>(&pvr_version), sizeof pvr_version);
+    if(pvr_version != PvrLegacyProps::kHeaderSizeV1 && pvr_version != PvrLegacyProps::kHeaderSizeV2) {
+      error_string = "Not a valid legacy (v1 or v2) PVR file";
+      return false;
+    }
+    file.read(reinterpret_cast<char*>(&this->impl_v1_), sizeof(this->impl_v1_));
+    if(pvr_version == PvrLegacyProps::kHeaderSizeV2) {
+      file.read(reinterpret_cast<char*>(&this->impl_v2_), sizeof(this->impl_v2_));
+    }
+    HEADER_POST_LOAD(file)
+  }
   virtual std::string ToString(){assert(0);}
   virtual std::string ToCsvString(){assert(0);}
 private:
   #pragma pack(4)
   struct ImplV1 {
-    std::uint32_t header_size;        //!< size of the structure
     std::uint32_t height;             //!< height of surface to be created
     std::uint32_t width;              //!< width of input surface
     std::uint32_t mip_map_count;      //!< number of mip-map levels requested
@@ -328,7 +349,7 @@ namespace PvrV3Props {
   STRING_ENUM_PAIR(CompressedFormat,EAC_R11),
   STRING_ENUM_PAIR(CompressedFormat,EAC_RG11)
   };
-  std::vector<std::string> var_names {
+  std::vector<std::string> column_names {
     "Flags",
     "Compressed format",
     "Channel name [0]",
@@ -353,7 +374,7 @@ namespace PvrV3Props {
 class PvrV3Header: public IHeader {
 public:
   virtual bool LoadHeader(std::ifstream& file, std::string& error_string) {
-    if(!file) return false;
+    HEADER_PRE_LOAD(file)
     std::uint32_t pvr_version;
     file.read(reinterpret_cast<char*>(&pvr_version), sizeof pvr_version);
     if(pvr_version == PvrV3Header::PVRv3) {}
@@ -366,46 +387,45 @@ public:
       return false;
     }
     file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
-    file.close();
-    return true;
+    HEADER_POST_LOAD(file)
   };
   virtual std::string ToString() {
     std::string out_string("");
     const auto& impl(this->impl_);
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[0],impl.flags)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[0],impl.flags)
     if(impl.pixel_format.u32[1] == 0) {
-      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[1],
+      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[1],
         PvrV3Props::compressed_format_names.find(impl.pixel_format.u8[0])->second)
       for(unsigned int index = 0; index < 8; index++)
-        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[2+index],c_empty_string)
+        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[2+index],c_empty_string)
       }
     else {
-      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[1],c_empty_string)
+      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[1],c_empty_string)
       // Channel names
       for(unsigned int index = 0; index < 4; index++) {
         // Convert unsigned int pulled from the header into a literal character
         char value(c_empty_string[0]);
         std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
-        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[2+index],value)
+        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[2+index],value)
       }
       // Bits per-pixel
       for(unsigned int index = 4; index < 8; index++)
         if(impl.pixel_format.u8[index]==0)
-          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[2+index],c_empty_string)
+          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[2+index],c_empty_string)
         else
-          APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[2+index],impl.pixel_format.u8[index])
+          APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[2+index],impl.pixel_format.u8[index])
     }
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[10],
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[10],
       ColorSpaceNames.find(impl.color_space)->second)
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::var_names[11],
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[11],
       VariableTypeNames.find(impl.channel_type)->second)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[12],impl.height)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[13],impl.width)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[14],impl.depth)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[15],impl.num_surfaces)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[16],impl.num_faces)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[17],impl.mip_map_count)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::var_names[18],impl.meta_data_size)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[12],impl.height)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[13],impl.width)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[14],impl.depth)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[15],impl.num_surfaces)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[16],impl.num_faces)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[17],impl.mip_map_count)
+    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[18],impl.meta_data_size)
     return out_string;
   };
   virtual std::string ToCsvString() {
