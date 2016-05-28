@@ -235,7 +235,20 @@ namespace PvrLegacyProps {
   const std::uint32_t kHeaderSizeV1 = 44;
   const std::uint32_t kHeaderSizeV2 = 52;
   
-  std::vector<std::string> column_names {""};
+  std::vector<std::string> column_names {
+  "Height",
+  "Width",
+  "Number of MIP maps",
+  "Pixel format flags",
+  "Data size",
+  "Number of bits",
+  "Red mask?",
+  "Green mask?",
+  "Blue mask?",
+  "Alpha mask?",
+  "Magic number",
+  "Number of surfaces"
+  };
 }
 // PVR Version 1 & 2
 class PvrLegacyHeader: public IHeader {
