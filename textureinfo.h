@@ -441,7 +441,24 @@ public:
     }
     HEADER_POST_LOAD(file)
   }
-  virtual std::string ToString(){assert(0);}
+  virtual std::string ToString(){
+    std::string out_string("");
+    const auto& impl_v1(this->impl_v1_);
+    const auto& impl_v2(this->impl_v2_);
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[0],impl_v1.height)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[1],impl_v1.width)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[2],impl_v1.mip_map_count)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[3],impl_v1.pixel_format_flags)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[4],impl_v1.data_size)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[5],impl_v1.bit_count)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[6],impl_v1.red_mask)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[7],impl_v1.green_mask)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[8],impl_v1.blue_mask)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[9],impl_v1.alpha_mask)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[10],impl_v2.magic_number)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[11],impl_v2.num_surfaces)
+    return out_string;
+  }
   virtual std::string ToCsvString(){assert(0);}
 private:
   #pragma pack(4)
