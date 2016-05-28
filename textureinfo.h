@@ -413,7 +413,7 @@ namespace PvrLegacyProps {
   "Height",
   "Width",
   "Number of MIP maps",
-  "Pixel format flags",
+  "Format",
   "Data size",
   "Number of bits",
   "Red mask?",
@@ -448,7 +448,9 @@ public:
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[0],impl_v1.height)
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[1],impl_v1.width)
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[2],impl_v1.mip_map_count+1)
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[3],impl_v1.pixel_format_flags)
+    const std::uint32_t pixel_format(impl_v1.pixel_format_flags&PvrLegacyProps::kPixelTypeMask);
+    const std::string pixel_format_string(PvrLegacyProps::pixel_format_names.find(pixel_format)->second);
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[3],pixel_format_string)
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[4],impl_v1.data_size)
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[5],impl_v1.bit_count)
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[6],impl_v1.red_mask)
