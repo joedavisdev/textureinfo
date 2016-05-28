@@ -2,6 +2,7 @@
 #include <iostream>
 #include <fstream>
 #include <utility>
+#include <vector>
 
 #include <cstring>
 #include <stdint.h>
@@ -12,8 +13,12 @@
 // Global variables
 //-------------------------------*/
 static const struct Defaults {
-  std::string csv_pvr_name;
-  Defaults():csv_pvr_name("pvr_info.csv"){}
+  enum Types {
+    PVRV3,
+    PVRLegacy
+  };
+  std::vector<std::string> csv_names;
+  Defaults():csv_names{"pvrV3.csv","pvrLegacy.csv"}{}
 }s_defaults;
 static struct Parameters {
   bool print_csv;
@@ -38,10 +43,14 @@ static std::string GetFilenameExt(std::string filename) {
 static void PrintDivider() {
   printf("========================================\n");
 }
-static void PrintHeaderInfo(const std::string& file_name, const std::string& header_info) {
+static void PrintHeaderInfo(
+  const std::string& file_name,
+  const std::string& container_name,
+  const std::string& header_info) {
   PrintDivider();
   std::cout << file_name << std::endl;
   PrintDivider();
+  std::cout << "Container: " << container_name << std::endl;
   std::cout << header_info << std::endl;
 }
 static void PrintHelp() {
@@ -60,7 +69,9 @@ static void PrintHelp() {
 //-------------------------------*/
 int main (int argc, char *argv[]) {
   std::vector<std::string> pvr_files;
+  //*-------------------------------
   // Loop through args
+  //-------------------------------*/
   for(unsigned int index = 1; index < argc; index++) {
     // Flags
     if(strcmp(argv[index], "/?") == 0 ||
@@ -79,39 +90,74 @@ int main (int argc, char *argv[]) {
       pvr_files.push_back(std::move(file_name));
     }
   }
+  //*-------------------------------
   // CSV setup
-  std::ofstream csv_pvr_output;
+  //-------------------------------*/
+  std::vector<std::ofstream> output_streams(s_defaults.csv_names.size());
   if(s_parameters.print_csv) {
-    csv_pvr_output.open(s_defaults.csv_pvr_name);
-    if(!csv_pvr_output.is_open()) {
-      printf("ERROR: Unable to open %s",s_defaults.csv_pvr_name.c_str());
+    for(unsigned int index = 0; index < output_streams.size(); ++index) {
+      const std::string& output_name(s_defaults.csv_names.at(index));
+      std::ofstream& output(output_streams.at(index));
+      output.open(output_name);
+      if(!output.is_open()) {
+        printf("ERROR: Unable to open %s", output_name.c_str());
+      }
+      std::vector<std::string> column_titles;
+      switch (index) {
+        case Defaults::Types::PVRV3:
+          column_titles = PvrV3Props::column_names;
+          break;
+        case Defaults::Types::PVRLegacy:
+          column_titles = PvrLegacyProps::column_names;
+          break;
+        default:
+          assert(0);
+          break;
+      }
+      for(auto& column_title : column_titles)
+        output << column_title << ',';
+      output << std::endl;
     }
-    for(auto& variable_name : PvrV3Props::var_names)
-      csv_pvr_output << variable_name << ',';
-    csv_pvr_output << std::endl;
   }
-  
+  //*-------------------------------
+  // Load files & print
+  //-------------------------------*/
   std::string error_string("");
-  // Process PVR files
+  // PVR files
   for(const auto& file_name: pvr_files) {
     std::ifstream file(file_name, std::ifstream::binary);
     if(!file.is_open()) {
       printf("ERROR: Unable to open %s\n", file_name.c_str());
       continue;
     }
+    unsigned int file_type(Defaults::Types::PVRV3);
+    IHeader* header(nullptr);
     PvrV3Header pvr_header;
-    if(!pvr_header.LoadHeader(file, error_string)) {
-      printf("ERROR: %s - %s\n",file_name.c_str(), error_string.c_str());
-      continue;
+    PvrLegacyHeader pvr_legacy_header;
+    // PVR v3
+    if(pvr_header.LoadHeader(file, error_string)) header = &pvr_header;
+    else file_type = Defaults::Types::PVRLegacy;
+    // Legacy container
+    if(header == nullptr) {
+      if(pvr_legacy_header.LoadHeader(file, error_string)) {
+        header = &pvr_legacy_header;
+      }
+      else {
+        printf("ERROR: %s - %s\n",file_name.c_str(), error_string.c_str());
+        continue;
+      }
     }
-    if(s_parameters.print_csv) {
-      csv_pvr_output << pvr_header.ToCsvString().c_str() << std::endl;
-    }
-    else {
-      PrintHeaderInfo(file_name,pvr_header.ToString());
-    }
+    // Print
+    if(s_parameters.print_csv)
+      output_streams[file_type] << header->ToCsvString().c_str() << std::endl;
+    else
+      PrintHeaderInfo(
+        file_name,
+        file_type == Defaults::Types::PVRV3?"PVR (v3)":"PVR (legacy)",
+        header->ToString());
   }
   
   // Shutdown
-  csv_pvr_output.close();
+  for(auto& stream:output_streams)
+    stream.close();
 }
