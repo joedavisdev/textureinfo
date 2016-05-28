@@ -2,7 +2,9 @@
 
 A simple command-line utility for inspecting texture file header data. Currently supports the following container formats:
 
-* PVR (v3)
+* PVR
+	* v3
+	* v1 & v2 (a.k.a. legacy)
 
 # Build health
 
@@ -16,12 +18,12 @@ A simple command-line utility for inspecting texture file header data. Currently
 
 # Building
 
-## Linux & OS X
+## Linux & OS X script build
 ````bash
 ./build.sh
 ````
 
-## Manual
+## Manual build
 
 ````
 mkdir -p build
@@ -32,7 +34,7 @@ cd ..
 
 ````
 
-# Instructions
+# Usage
 
 ````
 usage: textureinfo [--csv] ...
