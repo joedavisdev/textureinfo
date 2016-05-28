@@ -403,6 +403,16 @@ namespace PvrLegacyProps {
     STRING_ENUM_PAIR(Flags,HAS_ALPHA),
     STRING_ENUM_PAIR(Flags,VERTICAL_FLIP)
   };
+  std::string PrintFlagNames(unsigned int flags) {
+    std::string output;
+    if(flags&Flags::MIP_MAP) output.append(flag_names.find(Flags::MIP_MAP)->second + "|");
+    if(flags&Flags::BUMP_MAP) output.append(flag_names.find(Flags::BUMP_MAP)->second + "|");
+    if(flags&Flags::CUBE_MAP) output.append(flag_names.find(Flags::CUBE_MAP)->second + "|");
+    if(flags&Flags::VOLUME_TEXTURE) output.append(flag_names.find(Flags::VOLUME_TEXTURE)->second + "|");
+    if(flags&Flags::HAS_ALPHA) output.append(flag_names.find(Flags::HAS_ALPHA)->second + "|");
+    if(flags&Flags::VERTICAL_FLIP) output.append(flag_names.find(Flags::VERTICAL_FLIP)->second + "|");
+    return output;
+  };
   const std::uint32_t kPixelTypeMask = 0xff;
   // The old PVR header identifier is the characters 'PVR!', V2 only. Usually ignored...
   const std::uint32_t kIdentifierV2 = 0x21525650;
@@ -421,7 +431,8 @@ namespace PvrLegacyProps {
   "Blue mask?",
   "Alpha mask?",
   "Magic number",
-  "Number of surfaces"
+  "Number of surfaces",
+  "Flags"
   };
 }
 // PVR Version 1 & 2
@@ -461,6 +472,7 @@ public:
     APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[10],magic_number_string)
     std::string num_surfaces_string(impl_v2.num_surfaces == 0?std::string("-"):std::to_string(impl_v2.num_surfaces));
     APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[11],num_surfaces_string)
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[12],PvrLegacyProps::PrintFlagNames(impl_v1.pixel_format_flags))
     return out_string;
   }
   virtual std::string ToCsvString(){assert(0);}
