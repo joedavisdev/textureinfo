@@ -458,7 +458,7 @@ public:
     std::string magic_number_string(impl_v2.magic_number == 0?std::string("-"):std::to_string(impl_v2.magic_number));
     APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[10],magic_number_string)
     std::string num_surfaces_string(impl_v2.num_surfaces == 0?std::string("-"):std::to_string(impl_v2.num_surfaces));
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[10],num_surfaces_string)
+    APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[11],num_surfaces_string)
     return out_string;
   }
   virtual std::string ToCsvString(){assert(0);}
