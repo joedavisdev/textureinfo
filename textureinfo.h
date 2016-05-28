@@ -447,7 +447,7 @@ public:
     const auto& impl_v2(this->impl_v2_);
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[0],impl_v1.height)
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[1],impl_v1.width)
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[2],impl_v1.mip_map_count)
+    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[2],impl_v1.mip_map_count+1)
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[3],impl_v1.pixel_format_flags)
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[4],impl_v1.data_size)
     APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[5],impl_v1.bit_count)
