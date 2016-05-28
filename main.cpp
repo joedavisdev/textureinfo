@@ -43,10 +43,14 @@ static std::string GetFilenameExt(std::string filename) {
 static void PrintDivider() {
   printf("========================================\n");
 }
-static void PrintHeaderInfo(const std::string& file_name, const std::string& header_info) {
+static void PrintHeaderInfo(
+  const std::string& file_name,
+  const std::string& container_name,
+  const std::string& header_info) {
   PrintDivider();
   std::cout << file_name << std::endl;
   PrintDivider();
+  std::cout << "Container: " << container_name << std::endl;
   std::cout << header_info << std::endl;
 }
 static void PrintHelp() {
@@ -147,7 +151,10 @@ int main (int argc, char *argv[]) {
     if(s_parameters.print_csv)
       output_streams[file_type] << header->ToCsvString().c_str() << std::endl;
     else
-      PrintHeaderInfo(file_name,header->ToString());
+      PrintHeaderInfo(
+        file_name,
+        file_type == Defaults::Types::PVRV3?"PVR (v3)":"PVR (legacy)",
+        header->ToString());
   }
   
   // Shutdown
