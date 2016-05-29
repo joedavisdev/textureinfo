@@ -615,6 +615,7 @@ std::vector<std::string> VariablesAsStrings() {
       for(unsigned int index = 0; index < 4; index++) {
         // Convert unsigned int pulled from the header into a literal character
         char value_char(impl.pixel_format.u8[index]);
+        if(!value_char) value_char = c_empty_string[0];
         const std::string value((char*)&value_char);
         output.push_back(value);
       }
