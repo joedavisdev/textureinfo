@@ -440,10 +440,10 @@ private:
       output.push_back(pixel_format_string);
       output.push_back(std::to_string(impl_v1.data_size));
       output.push_back(std::to_string(impl_v1.bit_count));
-      output.push_back(std::to_string(impl_v1.red_mask));
-      output.push_back(std::to_string(impl_v1.green_mask));
-      output.push_back(std::to_string(impl_v1.blue_mask));
-      output.push_back(std::to_string(impl_v1.alpha_mask));
+      output.push_back(impl_v1.red_mask==0?"False":"True");
+      output.push_back(impl_v1.green_mask==0?"False":"True");
+      output.push_back(impl_v1.blue_mask==0?"False":"True");
+      output.push_back(impl_v1.alpha_mask==0?"False":"True");
       const std::string magic_number_string(
         impl_v2.magic_number == 0?std::string("-"):std::to_string(impl_v2.magic_number));
       output.push_back(magic_number_string);
