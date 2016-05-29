@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <ostream>
 
 #include <cstring>
 #include <assert.h>
@@ -592,6 +593,44 @@ namespace PvrV3Props {
   };
 };
 class PvrV3Header: public IHeader {
+private:
+std::vector<std::string> VariablesAsStrings() {
+    std::vector<std::string> output;
+    const auto& impl(this->impl_);
+    output.push_back(std::to_string(impl.flags));
+    // If the last 16-bits are empty, it's a compressed format
+    if(impl.pixel_format.u32[1] == 0) {
+        output.push_back(PvrV3Props::compressed_format_names.find(impl.pixel_format.u8[0])->second);
+      for(unsigned int index = 0; index < 8; index++)
+        output.push_back(c_empty_string);
+      }
+    else {
+      output.push_back(c_empty_string);
+      // Channel names
+      for(unsigned int index = 0; index < 4; index++) {
+        // Convert unsigned int pulled from the header into a literal character
+        char value(c_empty_string[0]);
+        std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
+        output.push_back(std::to_string(value));
+      }
+      // Bits per-pixel
+      for(unsigned int index = 4; index < 8; index++)
+        if(impl.pixel_format.u8[index]==0)
+          output.push_back(c_empty_string);
+        else
+          output.push_back(std::to_string(impl.pixel_format.u8[index]));
+    }
+    output.push_back(ColorSpaceNames.find(impl.color_space)->second);
+    output.push_back(VariableTypeNames.find(impl.channel_type)->second);
+    output.push_back(std::to_string(impl.height));
+    output.push_back(std::to_string(impl.width));
+    output.push_back(std::to_string(impl.depth));
+    output.push_back(std::to_string(impl.num_surfaces));
+    output.push_back(std::to_string(impl.num_faces));
+    output.push_back(std::to_string(impl.mip_map_count));
+    output.push_back(std::to_string(impl.meta_data_size));
+    return output;
+  }
 public:
   virtual bool LoadHeader(std::ifstream& file, std::string& error_string) {
     HEADER_PRE_LOAD(file)
@@ -608,83 +647,21 @@ public:
     }
     file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
     HEADER_POST_LOAD(file)
-  };
+  }
   virtual std::string ToString() {
-    std::string out_string("");
-    const auto& impl(this->impl_);
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[0],impl.flags)
-    if(impl.pixel_format.u32[1] == 0) {
-      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[1],
-        PvrV3Props::compressed_format_names.find(impl.pixel_format.u8[0])->second)
-      for(unsigned int index = 0; index < 8; index++)
-        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[2+index],c_empty_string)
-      }
-    else {
-      APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[1],c_empty_string)
-      // Channel names
-      for(unsigned int index = 0; index < 4; index++) {
-        // Convert unsigned int pulled from the header into a literal character
-        char value(c_empty_string[0]);
-        std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
-        APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[2+index],value)
-      }
-      // Bits per-pixel
-      for(unsigned int index = 4; index < 8; index++)
-        if(impl.pixel_format.u8[index]==0)
-          APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[2+index],c_empty_string)
-        else
-          APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[2+index],impl.pixel_format.u8[index])
-    }
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[10],
-      ColorSpaceNames.find(impl.color_space)->second)
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrV3Props::column_names[11],
-      VariableTypeNames.find(impl.channel_type)->second)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[12],impl.height)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[13],impl.width)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[14],impl.depth)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[15],impl.num_surfaces)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[16],impl.num_faces)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[17],impl.mip_map_count)
-    APPEND_FORMATTED_ROW(out_string,PvrV3Props::column_names[18],impl.meta_data_size)
-    return out_string;
-  };
+    std::string output("");
+    const auto& variable_strings(this->VariablesAsStrings());
+    for(unsigned int index=0; index<PvrV3Props::column_names.size();++index)
+      output.append(PvrV3Props::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
+    return output;
+  }
   virtual std::string ToCsvString() {
-    std::string csv_string("");
-    const auto& impl(this->impl_);
-    AppendCsvifiedRow(csv_string,std::to_string(impl.flags));
-    if(impl.pixel_format.u32[1] == 0) {
-      AppendCsvifiedRow(csv_string,
-        PvrV3Props::compressed_format_names.find(impl.pixel_format.u8[0])->second);
-      for(unsigned int index = 0; index < 8; index++)
-        AppendCsvifiedRow(csv_string,c_empty_string);
-      }
-    else {
-      AppendCsvifiedRow(csv_string,c_empty_string);
-      // Channel names
-      for(unsigned int index = 0; index < 4; index++) {
-        // Convert unsigned int pulled from the header into a literal character
-        char value(c_empty_string[0]);
-        std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
-        AppendCsvifiedRow(csv_string,std::string(&value));
-      }
-      // Bits per-pixel
-      for(unsigned int index = 4; index < 8; index++)
-        if(impl.pixel_format.u8[index]==0)
-          AppendCsvifiedRow(csv_string,c_empty_string);
-        else
-          AppendCsvifiedRow(csv_string,std::to_string(impl.pixel_format.u8[index]));
-    }
-    AppendCsvifiedRow(csv_string,std::to_string(impl.color_space));
-    AppendCsvifiedRow(csv_string,std::to_string(impl.channel_type));
-    AppendCsvifiedRow(csv_string,std::to_string(impl.height));
-    AppendCsvifiedRow(csv_string,std::to_string(impl.width));
-    AppendCsvifiedRow(csv_string,std::to_string(impl.depth));
-    AppendCsvifiedRow(csv_string,std::to_string(impl.num_surfaces));
-    AppendCsvifiedRow(csv_string,std::to_string(impl.num_faces));
-    AppendCsvifiedRow(csv_string,std::to_string(impl.mip_map_count));
-    AppendCsvifiedRow(csv_string,std::to_string(impl.meta_data_size));
-    return csv_string;
-  };
+    std::string output("");
+    const auto& variable_strings(this->VariablesAsStrings());
+    for(const auto& variable_string:variable_strings)
+      output.append(variable_string + ',');
+    return output;
+  }
 private:
     enum {
       PVRv3 = 0x03525650, //!< PVR format v3 identifier
