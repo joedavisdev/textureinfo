@@ -614,9 +614,9 @@ std::vector<std::string> VariablesAsStrings() {
       // Channel names
       for(unsigned int index = 0; index < 4; index++) {
         // Convert unsigned int pulled from the header into a literal character
-        char value(c_empty_string[0]);
-        std::sscanf((char*)&impl.pixel_format.u8[index],"%c",&value);
-        output.push_back(std::to_string(value));
+        char value_char(impl.pixel_format.u8[index]);
+        const std::string value((char*)&value_char);
+        output.push_back(value);
       }
       // Bits per-pixel
       for(unsigned int index = 4; index < 8; index++)
