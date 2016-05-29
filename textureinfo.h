@@ -7,19 +7,8 @@
 #include <assert.h>
 
 //*-------------------------------
-// Global functions
-//-------------------------------*/
-static const void AppendCsvifiedRow(std::string& property, const std::string& value) {
-  property.append(value + ',');
-}
-
-//*-------------------------------
 // Macros
 //-------------------------------*/
-#define APPEND_FORMATTED_ROW_RAW(string__,value_name__,value__) \
-  string__.append(value_name__ + ": " + value__ + "\n");
-#define APPEND_FORMATTED_ROW(string__,value_name__,value__) \
-  APPEND_FORMATTED_ROW_RAW(string__,value_name__,std::to_string(value__))
 #define STRING_ENUM_PAIR(namespace__,enum__) {namespace__::enum__,#enum__}
 #define HEADER_PRE_LOAD(file__) \
   if(!file__) return false; \
@@ -438,6 +427,32 @@ namespace PvrLegacyProps {
 }
 // PVR Version 1 & 2
 class PvrLegacyHeader: public IHeader {
+private:
+  std::vector<std::string> VariablesAsStrings() {
+      std::vector<std::string> output;
+      const auto& impl_v1(this->impl_v1_);
+      const auto& impl_v2(this->impl_v2_);
+      output.push_back(std::to_string(impl_v1.height));
+      output.push_back(std::to_string(impl_v1.width));
+      output.push_back(std::to_string(impl_v1.mip_map_count+1));
+      const std::uint32_t pixel_format(impl_v1.pixel_format_flags&PvrLegacyProps::kPixelTypeMask);
+      const std::string pixel_format_string(PvrLegacyProps::pixel_format_names.find(pixel_format)->second);
+      output.push_back(pixel_format_string);
+      output.push_back(std::to_string(impl_v1.data_size));
+      output.push_back(std::to_string(impl_v1.bit_count));
+      output.push_back(std::to_string(impl_v1.red_mask));
+      output.push_back(std::to_string(impl_v1.green_mask));
+      output.push_back(std::to_string(impl_v1.blue_mask));
+      output.push_back(std::to_string(impl_v1.alpha_mask));
+      const std::string magic_number_string(
+        impl_v2.magic_number == 0?std::string("-"):std::to_string(impl_v2.magic_number));
+      output.push_back(magic_number_string);
+      const std::string num_surfaces_string(
+        impl_v2.num_surfaces == 0?std::string("-"):std::to_string(impl_v2.num_surfaces));
+      output.push_back(num_surfaces_string);
+      output.push_back(PvrLegacyProps::PrintFlagNames(impl_v1.pixel_format_flags));
+      return output;
+    }
 public:
   virtual bool LoadHeader(std::ifstream& file, std::string& error_string) {
     HEADER_PRE_LOAD(file)
@@ -453,30 +468,20 @@ public:
     }
     HEADER_POST_LOAD(file)
   }
-  virtual std::string ToString(){
-    std::string out_string("");
-    const auto& impl_v1(this->impl_v1_);
-    const auto& impl_v2(this->impl_v2_);
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[0],impl_v1.height)
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[1],impl_v1.width)
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[2],impl_v1.mip_map_count+1)
-    const std::uint32_t pixel_format(impl_v1.pixel_format_flags&PvrLegacyProps::kPixelTypeMask);
-    const std::string pixel_format_string(PvrLegacyProps::pixel_format_names.find(pixel_format)->second);
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[3],pixel_format_string)
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[4],impl_v1.data_size)
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[5],impl_v1.bit_count)
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[6],impl_v1.red_mask)
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[7],impl_v1.green_mask)
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[8],impl_v1.blue_mask)
-    APPEND_FORMATTED_ROW(out_string,PvrLegacyProps::column_names[9],impl_v1.alpha_mask)
-    std::string magic_number_string(impl_v2.magic_number == 0?std::string("-"):std::to_string(impl_v2.magic_number));
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[10],magic_number_string)
-    std::string num_surfaces_string(impl_v2.num_surfaces == 0?std::string("-"):std::to_string(impl_v2.num_surfaces));
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[11],num_surfaces_string)
-    APPEND_FORMATTED_ROW_RAW(out_string,PvrLegacyProps::column_names[12],PvrLegacyProps::PrintFlagNames(impl_v1.pixel_format_flags))
-    return out_string;
+  virtual std::string ToString() {
+    std::string output("");
+    const auto& variable_strings(this->VariablesAsStrings());
+    for(unsigned int index=0; index<PvrLegacyProps::column_names.size();++index)
+      output.append(PvrLegacyProps::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
+    return output;
   }
-  virtual std::string ToCsvString(){assert(0);}
+  virtual std::string ToCsvString() {
+    std::string output("");
+    const auto& variable_strings(this->VariablesAsStrings());
+    for(const auto& variable_string:variable_strings)
+      output.append(variable_string + ',');
+    return output;
+  }
 private:
   #pragma pack(4)
   struct ImplV1 {
