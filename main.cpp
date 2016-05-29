@@ -124,6 +124,7 @@ int main (int argc, char *argv[]) {
           assert(0);
           break;
       }
+      output << "File name" << ',';
       for(auto& column_title : column_titles)
         output << column_title << ',';
       output << std::endl;
@@ -159,7 +160,7 @@ int main (int argc, char *argv[]) {
     }
     // Print
     if(s_parameters.print_csv)
-      output_streams[file_type] << header->ToCsvString().c_str() << std::endl;
+      output_streams[file_type] << file_name << "," << header->ToCsvString().c_str() << std::endl;
     else
       PrintHeaderInfo(
         file_name,
