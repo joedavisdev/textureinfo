@@ -27,7 +27,7 @@ static struct Parameters {
 
 static const
 std::vector<std::pair<std::string, std::string>> ParameterInfo {
-{"--csv","Write header information to a CSV file (calling directory)"}
+{"--csv","Write header information to a CSV file (calling directory). Disables stdout print"}
 };
 
 //*-------------------------------
