@@ -72,6 +72,10 @@ int main (int argc, char *argv[]) {
   //*-------------------------------
   // Loop through args
   //-------------------------------*/
+  if(argc == 1) {
+    PrintHelp();
+    return 0;
+  }
   for(unsigned int index = 1; index < argc; index++) {
     // Flags
     if(strcmp(argv[index], "/?") == 0 ||
