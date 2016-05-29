@@ -3,8 +3,8 @@
 A simple command-line utility for inspecting texture file header data. Currently supports the following container formats:
 
 * PVR
-	* v3
 	* v1 & v2 (a.k.a. legacy)
+	* v3
 
 # Build health
 
@@ -39,6 +39,23 @@ cd ..
 ````
 usage: textureinfo [--csv] ...
 
-descriptions:
-	--csv: Write header information to a CSV file (calling directory)
+Print a texture container's header information to stdout. Supported containers:
+	* PVR (v1)
+	* PVR (v2)
+	* PVR (v3)
+
+options:
+	--csv: Write header information to a CSV file (calling directory). Disables stdout print
+````
+
+# Examples
+
+## Printing to stdout
+
+````
+````
+
+## Printing to CSV
+
+````
 ````
