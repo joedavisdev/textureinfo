@@ -54,11 +54,17 @@ static void PrintHeaderInfo(
   std::cout << header_info << std::endl;
 }
 static void PrintHelp() {
+  const std::vector<std::string> supported_containers
+  {"PVR (v1)","PVR (v2)","PVR (v3)"};
   std::cout << "usage: textureinfo ";
   for(const auto&parameter:ParameterInfo)
     std::cout << "[" << std::get<0>(parameter) << "] ";
   std::cout << "..." << std::endl << std::endl;
-  std::cout << "descriptions:" << std::endl;
+  std::cout << "Print a texture container's header information to stdout. Supported containers:" << std::endl;
+  for(const auto& container:supported_containers)
+      std::cout << "\t* " << container << std::endl;
+  std::cout << std::endl;
+  std::cout << "options:" << std::endl;
   for(const auto&parameter:ParameterInfo)
     std::cout << "\t" << std::get<0>(parameter) << ": "
       << std::get<1>(parameter) << std::endl;
