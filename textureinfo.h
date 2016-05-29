@@ -410,19 +410,19 @@ namespace PvrLegacyProps {
   const std::uint32_t kHeaderSizeV2 = 52;
   
   std::vector<std::string> column_names {
+  "Format",
+  "Number of bits",
   "Height",
   "Width",
+  "Array size",
   "Number of MIP maps",
-  "Format",
-  "Data size",
-  "Number of bits",
   "Red mask?",
   "Green mask?",
   "Blue mask?",
   "Alpha mask?",
   "Magic number",
-  "Number of surfaces",
-  "Flags"
+  "Flags",
+  "Data size"
   };
 }
 // PVR Version 1 & 2
@@ -432,14 +432,16 @@ private:
       std::vector<std::string> output;
       const auto& impl_v1(this->impl_v1_);
       const auto& impl_v2(this->impl_v2_);
-      output.push_back(std::to_string(impl_v1.height));
-      output.push_back(std::to_string(impl_v1.width));
-      output.push_back(std::to_string(impl_v1.mip_map_count+1));
       const std::uint32_t pixel_format(impl_v1.pixel_format_flags&PvrLegacyProps::kPixelTypeMask);
       const std::string pixel_format_string(PvrLegacyProps::pixel_format_names.find(pixel_format)->second);
       output.push_back(pixel_format_string);
-      output.push_back(std::to_string(impl_v1.data_size));
       output.push_back(std::to_string(impl_v1.bit_count));
+      output.push_back(std::to_string(impl_v1.height));
+      output.push_back(std::to_string(impl_v1.width));
+      const std::string num_surfaces_string(
+        impl_v2.num_surfaces == 0?std::string("-"):std::to_string(impl_v2.num_surfaces));
+      output.push_back(num_surfaces_string);
+      output.push_back(std::to_string(impl_v1.mip_map_count+1));
       output.push_back(impl_v1.red_mask==0?"False":"True");
       output.push_back(impl_v1.green_mask==0?"False":"True");
       output.push_back(impl_v1.blue_mask==0?"False":"True");
@@ -447,10 +449,8 @@ private:
       const std::string magic_number_string(
         impl_v2.magic_number == 0?std::string("-"):std::to_string(impl_v2.magic_number));
       output.push_back(magic_number_string);
-      const std::string num_surfaces_string(
-        impl_v2.num_surfaces == 0?std::string("-"):std::to_string(impl_v2.num_surfaces));
-      output.push_back(num_surfaces_string);
       output.push_back(PvrLegacyProps::PrintFlagNames(impl_v1.pixel_format_flags));
+      output.push_back(std::to_string(impl_v1.data_size));
       return output;
     }
 public:
@@ -575,8 +575,8 @@ namespace PvrV3Props {
   STRING_ENUM_PAIR(CompressedFormat,EAC_R11),
   STRING_ENUM_PAIR(CompressedFormat,EAC_RG11)
   };
+  
   std::vector<std::string> column_names {
-    "Flags",
     "Compressed format",
     "Channel name [0]",
     "Channel name [1]",
@@ -591,9 +591,10 @@ namespace PvrV3Props {
     "Height",
     "Width",
     "Depth",
-    "Number of surfaces",
+    "Array size",
     "Number of faces",
     "Number of MIP maps",
+    "Flags",
     "Meta data size"
   };
 };
@@ -602,7 +603,6 @@ private:
 std::vector<std::string> VariablesAsStrings() {
     std::vector<std::string> output;
     const auto& impl(this->impl_);
-    output.push_back(std::to_string(impl.flags));
     // If the last 16-bits are empty, it's a compressed format
     if(impl.pixel_format.u32[1] == 0) {
         output.push_back(PvrV3Props::compressed_format_names.find(impl.pixel_format.u8[0])->second);
@@ -633,6 +633,7 @@ std::vector<std::string> VariablesAsStrings() {
     output.push_back(std::to_string(impl.num_surfaces));
     output.push_back(std::to_string(impl.num_faces));
     output.push_back(std::to_string(impl.mip_map_count));
+    output.push_back(std::to_string(impl.flags));
     output.push_back(std::to_string(impl.meta_data_size));
     return output;
   }
