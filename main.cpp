@@ -12,6 +12,7 @@
 //*-------------------------------
 // Global variables
 //-------------------------------*/
+static const std::string s_version = "1.0.1";
 static const struct Defaults {
   enum Types {
     PVRV3,
@@ -56,6 +57,7 @@ static void PrintHeaderInfo(
 static void PrintHelp() {
   const std::vector<std::string> supported_containers
   {"PVR (v1)","PVR (v2)","PVR (v3)"};
+  std::cout << "version: " << s_version <<std::endl;
   std::cout << "usage: textureinfo ";
   for(const auto&parameter:ParameterInfo)
     std::cout << "[" << std::get<0>(parameter) << "] ";
