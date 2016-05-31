@@ -4,7 +4,6 @@ CMAKE_BIN=cmake
 if [ -n "$1" ]; then
     CMAKE_BIN=$1
 fi
-echo "DEBUG: CMake binary = $CMAKE_BIN"
 BUILD_DIR=build/default
 mkdir -p $BUILD_DIR
 cd $BUILD_DIR
