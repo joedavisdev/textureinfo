@@ -13,14 +13,23 @@
 // Global variables
 //-------------------------------*/
 static const std::string s_version = "1.0.1";
-static const struct Defaults {
+namespace Defaults {
   enum Types {
     PVRV3,
-    PVRLegacy
+    PVRLegacy,
+    KTX
   };
-  std::vector<std::string> csv_names;
-  Defaults():csv_names{"pvrV3.csv","pvrLegacy.csv"}{}
-}s_defaults;
+  const std::vector<std::string> kTypeNames {
+    "PVR (v3)",
+    "PVR (legacy)",
+    "KTX"
+  };
+  const std::vector<std::string> kCsvNames {
+  "pvrV3.csv",
+  "pvrLegacy.csv",
+  "ktx.csv"
+  };
+};
 static struct Parameters {
   bool print_csv;
   Parameters():print_csv(false){}
@@ -76,7 +85,7 @@ static void PrintHelp() {
 // main
 //-------------------------------*/
 int main (int argc, char *argv[]) {
-  std::vector<std::string> pvr_files;
+  std::vector<std::string> pvr_files, ktx_files;
   //*-------------------------------
   // Loop through args
   //-------------------------------*/
@@ -101,14 +110,17 @@ int main (int argc, char *argv[]) {
     if(ext_name == "pvr") {
       pvr_files.push_back(std::move(file_name));
     }
+    else if(ext_name == "ktx") {
+      ktx_files.push_back(std::move(file_name));
+    }
   }
   //*-------------------------------
   // CSV setup
   //-------------------------------*/
-  std::vector<std::ofstream> output_streams(s_defaults.csv_names.size());
+  std::vector<std::ofstream> output_streams(Defaults::kCsvNames.size());
   if(s_parameters.print_csv) {
     for(unsigned int index = 0; index < output_streams.size(); ++index) {
-      const std::string& output_name(s_defaults.csv_names.at(index));
+      const std::string& output_name(Defaults::kCsvNames.at(index));
       std::ofstream& output(output_streams.at(index));
       output.open(output_name);
       if(!output.is_open()) {
@@ -122,6 +134,8 @@ int main (int argc, char *argv[]) {
         case Defaults::Types::PVRLegacy:
           column_titles = PvrLegacyInfo::column_names;
           break;
+        case Defaults::Types::KTX:
+          column_titles = KTXInfo::column_names;
         default:
           assert(0);
           break;
@@ -162,12 +176,33 @@ int main (int argc, char *argv[]) {
     }
     // Print
     if(s_parameters.print_csv)
-      output_streams[file_type] << file_name << "," << header->ToCsvString().c_str() << std::endl;
+      output_streams[file_type] << file_name << "," << header->ToCsvString() << std::endl;
     else
       PrintHeaderInfo(
         file_name,
         file_type == Defaults::Types::PVRV3?"PVR (v3)":"PVR (legacy)",
         header->ToString());
+  }
+  // KTX files
+  for(const auto& file_name: ktx_files) {
+    std::ifstream file(file_name, std::ifstream::binary);
+    if(!file.is_open()) {
+      printf("ERROR: Unable to open %s\n", file_name.c_str());
+      continue;
+    }
+    KTXHeader ktx_header;
+    if(!ktx_header.LoadHeader(file, error_string)) {
+      printf("ERROR: %s - %s\n",file_name.c_str(), error_string.c_str());
+        continue;
+    }
+    // Print
+    if(s_parameters.print_csv)
+      output_streams.at(Defaults::Types::KTX) << file_name << "," << ktx_header.ToCsvString() << std::endl;
+    else
+      PrintHeaderInfo(
+        file_name,
+        Defaults::kTypeNames.at(Defaults::Types::KTX),
+        ktx_header.ToString());
   }
   
   // Shutdown

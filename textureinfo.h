@@ -5,6 +5,7 @@
 
 #include <cstring>
 #include <assert.h>
+#include <string.h>
 
 //*-------------------------------
 // Macros
@@ -745,12 +746,35 @@ private:
     }impl_;
 };
 
-namespace KTXProps {
+namespace KTXInfo {
+  static const std::uint8_t kIdentifier[] = { 0xAB, 0x4B, 0x54, 0x58, 0x20, 0x31, 0x31, 0xBB, 0x0D, 0x0A, 0x1A, 0x0A };
+  // Reference number to verify endianness of a file
+  static const std::uint32_t kEndianReference = 0x04030201;
+  // Expected size of a header in file
+  static const std::uint32_t kExpectedHeaderSize = 64;
+  // Identifier for the orientation meta data
+  static const std::uint8_t kOrientationMetaDataKey[] = "KTXOrientation";
+  
+  std::vector<std::string> column_names;
 };
 class KTXHeader: public IHeader {
+public:
+  virtual bool LoadHeader(std::ifstream& file, std::string& error_string){
+    HEADER_PRE_LOAD(file)
+    std::uint8_t identifier[12];
+    file.read(reinterpret_cast<char*>(&identifier), sizeof identifier);
+    if(memcmp(identifier,KTXInfo::kIdentifier,sizeof(KTXInfo::kIdentifier)) !=0) {
+      error_string = "Header does not contain a valid KTX identifier";
+      return false;
+    }
+    file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
+    HEADER_POST_LOAD(file)
+  }
+  virtual std::string ToString(){assert(0);}
+  virtual std::string ToCsvString(){assert(0);}
+private:
   #pragma pack(4)
   struct Impl {
-    std::uint8_t identifier[12];
     std::uint32_t endianness;
     std::uint32_t gl_type;
     std::uint32_t gl_type_size;
