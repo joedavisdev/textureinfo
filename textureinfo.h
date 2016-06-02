@@ -35,7 +35,7 @@ public:
 //*-------------------------------
 // Classes
 //-------------------------------*/
-namespace PvrLegacyProps {
+namespace PvrLegacyInfo {
   enum PixelFormat {
     // MGL Formats
     MGL_ARGB_4444 = 0x00,
@@ -432,8 +432,8 @@ private:
       std::vector<std::string> output;
       const auto& impl_v1(this->impl_v1_);
       const auto& impl_v2(this->impl_v2_);
-      const std::uint32_t pixel_format(impl_v1.pixel_format_flags&PvrLegacyProps::kPixelTypeMask);
-      const std::string pixel_format_string(PvrLegacyProps::pixel_format_names.find(pixel_format)->second);
+      const std::uint32_t pixel_format(impl_v1.pixel_format_flags&PvrLegacyInfo::kPixelTypeMask);
+      const std::string pixel_format_string(PvrLegacyInfo::pixel_format_names.find(pixel_format)->second);
       output.push_back(pixel_format_string);
       output.push_back(std::to_string(impl_v1.bit_count));
       output.push_back(std::to_string(impl_v1.height));
@@ -449,7 +449,7 @@ private:
       const std::string magic_number_string(
         impl_v2.magic_number == 0?std::string("-"):std::to_string(impl_v2.magic_number));
       output.push_back(magic_number_string);
-      output.push_back(PvrLegacyProps::PrintFlagNames(impl_v1.pixel_format_flags));
+      output.push_back(PvrLegacyInfo::PrintFlagNames(impl_v1.pixel_format_flags));
       output.push_back(std::to_string(impl_v1.data_size));
       return output;
     }
@@ -458,12 +458,12 @@ public:
     HEADER_PRE_LOAD(file)
     std::uint32_t pvr_version;
     file.read(reinterpret_cast<char*>(&pvr_version), sizeof pvr_version);
-    if(pvr_version != PvrLegacyProps::kHeaderSizeV1 && pvr_version != PvrLegacyProps::kHeaderSizeV2) {
+    if(pvr_version != PvrLegacyInfo::kHeaderSizeV1 && pvr_version != PvrLegacyInfo::kHeaderSizeV2) {
       error_string = "Not a valid legacy (v1 or v2) PVR file";
       return false;
     }
     file.read(reinterpret_cast<char*>(&this->impl_v1_), sizeof(this->impl_v1_));
-    if(pvr_version == PvrLegacyProps::kHeaderSizeV2) {
+    if(pvr_version == PvrLegacyInfo::kHeaderSizeV2) {
       file.read(reinterpret_cast<char*>(&this->impl_v2_), sizeof(this->impl_v2_));
     }
     HEADER_POST_LOAD(file)
@@ -471,8 +471,8 @@ public:
   virtual std::string ToString() {
     std::string output("");
     const auto& variable_strings(this->VariablesAsStrings());
-    for(unsigned int index=0; index<PvrLegacyProps::column_names.size();++index)
-      output.append(PvrLegacyProps::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
+    for(unsigned int index=0; index<PvrLegacyInfo::column_names.size();++index)
+      output.append(PvrLegacyInfo::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
     return output;
   }
   virtual std::string ToCsvString() {
@@ -505,7 +505,7 @@ private:
   }impl_v2_;
 };
 
-namespace PvrV3Props {
+namespace PvrV3Info {
   enum CompressedFormat {
     PVRTCI_2bpp_RGB,
     PVRTCI_2bpp_RGBA,
@@ -575,6 +575,59 @@ namespace PvrV3Props {
   STRING_ENUM_PAIR(CompressedFormat,EAC_R11),
   STRING_ENUM_PAIR(CompressedFormat,EAC_RG11)
   };
+  enum {
+    PVRv3 = 0x03525650, //!< PVR format v3 identifier
+    PVRv3Reversed = 0x50565203, //!< PVR format v3 reversed identifier
+
+    // PVR header flags.
+    CompressedFlag = (1 << 0), //!< Compressed format flag
+    PremultipliedFlag = (1 << 1), //!< Premultiplied flag
+    SizeOfHeader = 52
+  };
+  enum ColorSpace {
+    lRGB,
+    sRGB,
+    NumSpaces
+  };
+  std::multimap<unsigned int,std::string> color_space_names {
+    STRING_ENUM_PAIR(ColorSpace,lRGB),
+    STRING_ENUM_PAIR(ColorSpace,sRGB)
+  };
+  enum VariableType {
+    UnsignedByteNorm,
+    SignedByteNorm,
+    UnsignedByte,
+    SignedByte,
+    UnsignedShortNorm,
+    SignedShortNorm,
+    UnsignedShort,
+    SignedShort,
+    UnsignedIntegerNorm,
+    SignedIntegerNorm,
+    UnsignedInteger,
+    SignedInteger,
+    SignedFloat,
+    Float = SignedFloat,
+    UnsignedFloat,
+    NumVarTypes
+  };
+  std::multimap<unsigned int,std::string> variable_type_names {
+    STRING_ENUM_PAIR(VariableType,UnsignedByteNorm),
+    STRING_ENUM_PAIR(VariableType,SignedByteNorm),
+    STRING_ENUM_PAIR(VariableType,UnsignedByte),
+    STRING_ENUM_PAIR(VariableType,SignedByte),
+    STRING_ENUM_PAIR(VariableType,UnsignedShortNorm),
+    STRING_ENUM_PAIR(VariableType,SignedShortNorm),
+    STRING_ENUM_PAIR(VariableType,UnsignedShort),
+    STRING_ENUM_PAIR(VariableType,SignedShort),
+    STRING_ENUM_PAIR(VariableType,UnsignedIntegerNorm),
+    STRING_ENUM_PAIR(VariableType,SignedIntegerNorm),
+    STRING_ENUM_PAIR(VariableType,UnsignedInteger),
+    STRING_ENUM_PAIR(VariableType,SignedInteger),
+    STRING_ENUM_PAIR(VariableType,SignedFloat),
+    STRING_ENUM_PAIR(VariableType,Float),
+    STRING_ENUM_PAIR(VariableType,UnsignedFloat)
+  };
   
   std::vector<std::string> column_names {
     "Compressed format",
@@ -605,7 +658,7 @@ std::vector<std::string> VariablesAsStrings() {
     const auto& impl(this->impl_);
     // If the last 16-bits are empty, it's a compressed format
     if(impl.pixel_format.u32[1] == 0) {
-        output.push_back(PvrV3Props::compressed_format_names.find(impl.pixel_format.u8[0])->second);
+        output.push_back(PvrV3Info::compressed_format_names.find(impl.pixel_format.u8[0])->second);
       for(unsigned int index = 0; index < 8; index++)
         output.push_back(c_empty_string);
       }
@@ -626,8 +679,8 @@ std::vector<std::string> VariablesAsStrings() {
         else
           output.push_back(std::to_string(impl.pixel_format.u8[index]));
     }
-    output.push_back(ColorSpaceNames.find(impl.color_space)->second);
-    output.push_back(VariableTypeNames.find(impl.channel_type)->second);
+    output.push_back(PvrV3Info::color_space_names.find(impl.color_space)->second);
+    output.push_back(PvrV3Info::variable_type_names.find(impl.channel_type)->second);
     output.push_back(std::to_string(impl.height));
     output.push_back(std::to_string(impl.width));
     output.push_back(std::to_string(impl.depth));
@@ -643,8 +696,8 @@ public:
     HEADER_PRE_LOAD(file)
     std::uint32_t pvr_version;
     file.read(reinterpret_cast<char*>(&pvr_version), sizeof pvr_version);
-    if(pvr_version == PvrV3Header::PVRv3) {}
-    else if(pvr_version == PvrV3Header::PVRv3Reversed) {
+    if(pvr_version == PvrV3Info::PVRv3) {}
+    else if(pvr_version == PvrV3Info::PVRv3Reversed) {
       error_string = "Endianess does not matches host";
       return false;
     }
@@ -658,8 +711,8 @@ public:
   virtual std::string ToString() {
     std::string output("");
     const auto& variable_strings(this->VariablesAsStrings());
-    for(unsigned int index=0; index<PvrV3Props::column_names.size();++index)
-      output.append(PvrV3Props::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
+    for(unsigned int index=0; index<PvrV3Info::column_names.size();++index)
+      output.append(PvrV3Info::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
     return output;
   }
   virtual std::string ToCsvString() {
@@ -670,59 +723,6 @@ public:
     return output;
   }
 private:
-    enum {
-      PVRv3 = 0x03525650, //!< PVR format v3 identifier
-      PVRv3Reversed = 0x50565203, //!< PVR format v3 reversed identifier
-
-      // PVR header flags.
-      CompressedFlag = (1 << 0), //!< Compressed format flag
-      PremultipliedFlag = (1 << 1), //!< Premultiplied flag
-      SizeOfHeader = 52
-    };
-    enum ColorSpaceEnum {
-      lRGB,
-      sRGB,
-      NumSpaces
-    };
-    std::multimap<unsigned int,std::string> ColorSpaceNames {
-      STRING_ENUM_PAIR(PvrV3Header,lRGB),
-      STRING_ENUM_PAIR(PvrV3Header,sRGB)
-    };
-    enum VariableTypeEnum {
-      UnsignedByteNorm,
-      SignedByteNorm,
-      UnsignedByte,
-      SignedByte,
-      UnsignedShortNorm,
-      SignedShortNorm,
-      UnsignedShort,
-      SignedShort,
-      UnsignedIntegerNorm,
-      SignedIntegerNorm,
-      UnsignedInteger,
-      SignedInteger,
-      SignedFloat,
-      Float = SignedFloat,
-      UnsignedFloat,
-      NumVarTypes
-    };
-    std::multimap<unsigned int,std::string> VariableTypeNames {
-      STRING_ENUM_PAIR(PvrV3Header,UnsignedByteNorm),
-      STRING_ENUM_PAIR(PvrV3Header,SignedByteNorm),
-      STRING_ENUM_PAIR(PvrV3Header,UnsignedByte),
-      STRING_ENUM_PAIR(PvrV3Header,SignedByte),
-      STRING_ENUM_PAIR(PvrV3Header,UnsignedShortNorm),
-      STRING_ENUM_PAIR(PvrV3Header,SignedShortNorm),
-      STRING_ENUM_PAIR(PvrV3Header,UnsignedShort),
-      STRING_ENUM_PAIR(PvrV3Header,SignedShort),
-      STRING_ENUM_PAIR(PvrV3Header,UnsignedIntegerNorm),
-      STRING_ENUM_PAIR(PvrV3Header,SignedIntegerNorm),
-      STRING_ENUM_PAIR(PvrV3Header,UnsignedInteger),
-      STRING_ENUM_PAIR(PvrV3Header,SignedInteger),
-      STRING_ENUM_PAIR(PvrV3Header,SignedFloat),
-      STRING_ENUM_PAIR(PvrV3Header,Float),
-      STRING_ENUM_PAIR(PvrV3Header,UnsignedFloat)
-    };
     union PixelFormatUnion {
       std::uint64_t u64;
       std::uint32_t u32[2];
