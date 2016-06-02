@@ -65,7 +65,7 @@ static void PrintHeaderInfo(
 }
 static void PrintHelp() {
   const std::vector<std::string> supported_containers
-  {"PVR (v1)","PVR (v2)","PVR (v3)"};
+  {"PVR (v1)","PVR (v2)","PVR (v3)","KTX"};
   std::cout << "version: " << s_version <<std::endl;
   std::cout << "usage: textureinfo ";
   for(const auto&parameter:ParameterInfo)
@@ -136,6 +136,7 @@ int main (int argc, char *argv[]) {
           break;
         case Defaults::Types::KTX:
           column_titles = KTXInfo::column_names;
+          break;
         default:
           assert(0);
           break;

@@ -413,8 +413,8 @@ namespace PvrLegacyInfo {
   std::vector<std::string> column_names {
   "Format",
   "Number of bits",
-  "Height",
   "Width",
+  "Height",
   "Array size",
   "Number of MIP maps",
   "Red mask?",
@@ -429,7 +429,7 @@ namespace PvrLegacyInfo {
 // PVR Version 1 & 2
 class PvrLegacyHeader: public IHeader {
 private:
-  std::vector<std::string> VariablesAsStrings() {
+  std::vector<std::string> ToStringArray() {
       std::vector<std::string> output;
       const auto& impl_v1(this->impl_v1_);
       const auto& impl_v2(this->impl_v2_);
@@ -437,8 +437,8 @@ private:
       const std::string pixel_format_string(PvrLegacyInfo::pixel_format_names.find(pixel_format)->second);
       output.push_back(pixel_format_string);
       output.push_back(std::to_string(impl_v1.bit_count));
-      output.push_back(std::to_string(impl_v1.height));
       output.push_back(std::to_string(impl_v1.width));
+      output.push_back(std::to_string(impl_v1.height));
       const std::string num_surfaces_string(
         impl_v2.num_surfaces == 0?std::string("-"):std::to_string(impl_v2.num_surfaces));
       output.push_back(num_surfaces_string);
@@ -471,14 +471,14 @@ public:
   }
   virtual std::string ToString() {
     std::string output("");
-    const auto& variable_strings(this->VariablesAsStrings());
+    const auto& variable_strings(this->ToStringArray());
     for(unsigned int index=0; index<PvrLegacyInfo::column_names.size();++index)
       output.append(PvrLegacyInfo::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
     return output;
   }
   virtual std::string ToCsvString() {
     std::string output("");
-    const auto& variable_strings(this->VariablesAsStrings());
+    const auto& variable_strings(this->ToStringArray());
     for(const auto& variable_string:variable_strings)
       output.append(variable_string + ',');
     return output;
@@ -642,8 +642,8 @@ namespace PvrV3Info {
     "Bits per-pixel [3]",
     "Color space",
     "Channel type",
-    "Height",
     "Width",
+    "Height",
     "Depth",
     "Array size",
     "Number of faces",
@@ -654,7 +654,7 @@ namespace PvrV3Info {
 };
 class PvrV3Header: public IHeader {
 private:
-std::vector<std::string> VariablesAsStrings() {
+  std::vector<std::string> ToStringArray() {
     std::vector<std::string> output;
     const auto& impl(this->impl_);
     // If the last 16-bits are empty, it's a compressed format
@@ -682,8 +682,8 @@ std::vector<std::string> VariablesAsStrings() {
     }
     output.push_back(PvrV3Info::color_space_names.find(impl.color_space)->second);
     output.push_back(PvrV3Info::variable_type_names.find(impl.channel_type)->second);
-    output.push_back(std::to_string(impl.height));
     output.push_back(std::to_string(impl.width));
+    output.push_back(std::to_string(impl.height));
     output.push_back(std::to_string(impl.depth));
     output.push_back(std::to_string(impl.num_surfaces));
     output.push_back(std::to_string(impl.num_faces));
@@ -711,14 +711,14 @@ public:
   }
   virtual std::string ToString() {
     std::string output("");
-    const auto& variable_strings(this->VariablesAsStrings());
+    const auto& variable_strings(this->ToStringArray());
     for(unsigned int index=0; index<PvrV3Info::column_names.size();++index)
       output.append(PvrV3Info::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
     return output;
   }
   virtual std::string ToCsvString() {
     std::string output("");
-    const auto& variable_strings(this->VariablesAsStrings());
+    const auto& variable_strings(this->ToStringArray());
     for(const auto& variable_string:variable_strings)
       output.append(variable_string + ',');
     return output;
@@ -755,7 +755,21 @@ namespace KTXInfo {
   // Identifier for the orientation meta data
   static const std::uint8_t kOrientationMetaDataKey[] = "KTXOrientation";
   
-  std::vector<std::string> column_names;
+  std::vector<std::string> column_names {
+    "glFormat",
+    "glInternalFormat",
+    "glBaseInternalFormat",
+    "glType",
+    "glType size",
+    "Width",
+    "Height",
+    "Depth",
+    "Array size",
+    "Number of faces",
+    "Number of MIP maps",
+    "Bytes of key value data",
+    "Endianness"
+  };
 };
 class KTXHeader: public IHeader {
 public:
@@ -770,8 +784,38 @@ public:
     file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
     HEADER_POST_LOAD(file)
   }
-  virtual std::string ToString(){assert(0);}
-  virtual std::string ToCsvString(){assert(0);}
+  std::vector<std::string> ToStringArray() {
+    std::vector<std::string> output;
+    const auto& impl(this->impl_);
+    output.push_back(std::to_string(impl.gl_format));
+    output.push_back(std::to_string(impl.gl_internal_format));
+    output.push_back(std::to_string(impl.gl_base_internal_format));
+    output.push_back(std::to_string(impl.gl_type));
+    output.push_back(std::to_string(impl.gl_type_size));
+    output.push_back(std::to_string(impl.pixel_width));
+    output.push_back(std::to_string(impl.pixel_height));
+    output.push_back(std::to_string(impl.pixel_depth));
+    output.push_back(std::to_string(impl.number_of_array_elements));
+    output.push_back(std::to_string(impl.number_of_faces));
+    output.push_back(std::to_string(impl.number_of_mipmap_levels));
+    output.push_back(std::to_string(impl.bytes_of_key_value_data));
+    output.push_back(std::to_string(impl.endianness));
+    return output;
+  }
+  virtual std::string ToString() {
+    std::string output("");
+    const auto& variable_strings(this->ToStringArray());
+    for(unsigned int index=0; index<KTXInfo::column_names.size();++index)
+      output.append(KTXInfo::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
+    return output;
+  }
+  virtual std::string ToCsvString() {
+    std::string output("");
+    const auto& variable_strings(this->ToStringArray());
+    for(const auto& variable_string:variable_strings)
+      output.append(variable_string + ',');
+    return output;
+  }
 private:
   #pragma pack(4)
   struct Impl {
