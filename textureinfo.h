@@ -744,3 +744,26 @@ private:
       Impl() {memset(this, 0, sizeof(Impl));}
     }impl_;
 };
+
+namespace KTXProps {
+};
+class KTXHeader: public IHeader {
+  #pragma pack(4)
+  struct Impl {
+    std::uint8_t identifier[12];
+    std::uint32_t endianness;
+    std::uint32_t gl_type;
+    std::uint32_t gl_type_size;
+    std::uint32_t gl_format;
+    std::uint32_t gl_internal_format;
+    std::uint32_t gl_base_internal_format;
+    std::uint32_t pixel_width;
+    std::uint32_t pixel_height;
+    std::uint32_t pixel_depth;
+    std::uint32_t number_of_array_elements;
+    std::uint32_t number_of_faces;
+    std::uint32_t number_of_mipmap_levels;
+    std::uint32_t bytes_of_key_value_data;
+    Impl() {memset(this, 0, sizeof(Impl));}
+  }impl_;
+};
