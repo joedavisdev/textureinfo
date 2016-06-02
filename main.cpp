@@ -117,10 +117,10 @@ int main (int argc, char *argv[]) {
       std::vector<std::string> column_titles;
       switch (index) {
         case Defaults::Types::PVRV3:
-          column_titles = PvrV3Props::column_names;
+          column_titles = PvrV3Info::column_names;
           break;
         case Defaults::Types::PVRLegacy:
-          column_titles = PvrLegacyProps::column_names;
+          column_titles = PvrLegacyInfo::column_names;
           break;
         default:
           assert(0);
