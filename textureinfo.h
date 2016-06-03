@@ -20,6 +20,8 @@
 
 #define ENUM_DEF(enum__, value__) enum__ value__,
 #define ENUM_STRING_PAIR(enum__) {enum__,#enum__},
+#define ENUM_APPEND_TO_STRING(enum__) \
+  if(flags&enum__) output.append(flag_names.find(enum__)->second + "|");
 
 //*-------------------------------
 // Constants
@@ -41,7 +43,7 @@ public:
 //-------------------------------*/
 namespace PvrLegacyInfo {
   enum PixelFormat {
-    #define X(a,b) ENUM_DEF(a, b)
+    #define X(a,b) ENUM_DEF(a,b)
     #include "defs/pvrLegacy/pixel_format.def"
     #undef X
   };
@@ -51,49 +53,30 @@ namespace PvrLegacyInfo {
     #undef X
   };
   enum API {
-    ApiOGLES = 1,
-    ApiOGLES2,
-    ApiD3DM,
-    ApiOGL,
-    ApiDX9,
-    ApiDX10,
-    ApiOVG,
-    ApiMGL
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrLegacy/api.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> api_names {
-    STRING_ENUM_PAIR(API,ApiOGLES),
-    STRING_ENUM_PAIR(API,ApiOGLES2),
-    STRING_ENUM_PAIR(API,ApiD3DM),
-    STRING_ENUM_PAIR(API,ApiOGL),
-    STRING_ENUM_PAIR(API,ApiDX9),
-    STRING_ENUM_PAIR(API,ApiDX10),
-    STRING_ENUM_PAIR(API,ApiOVG),
-    STRING_ENUM_PAIR(API,ApiMGL)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrLegacy/api.def"
+    #undef X
   };
   enum Flags {
-    MIP_MAP         = (1 << 8),  // Texture has MIP Map levels
-    BUMP_MAP        = (1 << 10), // Texture has normals encoded for a bump map
-    CUBE_MAP        = (1 << 12), // Texture is a cubemap/skybox
-    VOLUME_TEXTURE  = (1 << 14), // Texture is a 3D texture
-    HAS_ALPHA       = (1 << 15), // Texture has transparency
-    VERTICAL_FLIP   = (1 << 16)  // Texture is vertically flipped
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrLegacy/flags.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> flag_names {
-    STRING_ENUM_PAIR(Flags,MIP_MAP),
-    STRING_ENUM_PAIR(Flags,BUMP_MAP),
-    STRING_ENUM_PAIR(Flags,CUBE_MAP),
-    STRING_ENUM_PAIR(Flags,VOLUME_TEXTURE),
-    STRING_ENUM_PAIR(Flags,HAS_ALPHA),
-    STRING_ENUM_PAIR(Flags,VERTICAL_FLIP)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrLegacy/flags.def"
+    #undef X
   };
   std::string PrintFlagNames(unsigned int flags) {
     std::string output;
-    if(flags&Flags::MIP_MAP) output.append(flag_names.find(Flags::MIP_MAP)->second + "|");
-    if(flags&Flags::BUMP_MAP) output.append(flag_names.find(Flags::BUMP_MAP)->second + "|");
-    if(flags&Flags::CUBE_MAP) output.append(flag_names.find(Flags::CUBE_MAP)->second + "|");
-    if(flags&Flags::VOLUME_TEXTURE) output.append(flag_names.find(Flags::VOLUME_TEXTURE)->second + "|");
-    if(flags&Flags::HAS_ALPHA) output.append(flag_names.find(Flags::HAS_ALPHA)->second + "|");
-    if(flags&Flags::VERTICAL_FLIP) output.append(flag_names.find(Flags::VERTICAL_FLIP)->second + "|");
+    #define X(a,b) ENUM_APPEND_TO_STRING(a)
+    #include "defs/pvrLegacy/flags.def"
+    #undef X
     return output;
   };
   const std::uint32_t kPixelTypeMask = 0xff;
