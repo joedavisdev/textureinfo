@@ -18,6 +18,11 @@
   file__.close(); \
   return true;
 
+#define ENUM_DEF(enum__, value__) enum__ value__,
+#define ENUM_STRING_PAIR(enum__) {enum__,#enum__},
+#define ENUM_APPEND_TO_STRING(enum__) \
+  if(flags&enum__) output.append(flag_names.find(enum__)->second + "|");
+
 //*-------------------------------
 // Constants
 //-------------------------------*/
@@ -38,370 +43,40 @@ public:
 //-------------------------------*/
 namespace PvrLegacyInfo {
   enum PixelFormat {
-    // MGL Formats
-    MGL_ARGB_4444 = 0x00,
-    MGL_ARGB_1555,
-    MGL_RGB_565,
-    MGL_RGB_555,
-    MGL_RGB_888,
-    MGL_ARGB_8888,
-    MGL_ARGB_8332,
-    MGL_I_8,
-    MGL_AI_88,
-    MGL_1_BPP,
-    MGL_VY1UY0,
-    MGL_Y1VY0U,
-    MGL_PVRTC2,
-    MGL_PVRTC4,
-    // OpenGL Formats
-    GL_RGBA_4444 = 0x10,
-    GL_RGBA_5551,
-    GL_RGBA_8888,
-    GL_RGB_565,
-    GL_RGB_555,
-    GL_RGB_888,
-    GL_I_8,
-    GL_AI_88,
-    GL_PVRTC2,
-    GL_PVRTC4,
-    GL_BGRA_8888,
-    GL_A_8,
-    GL_PVRTCII4,
-    GL_PVRTCII2,
-    // DirectX 9 and Earlier Formats
-    D3D_DXT1 = 0x20,
-    D3D_DXT2,
-    D3D_DXT3,
-    D3D_DXT4,
-    D3D_DXT5,
-    D3D_RGB_332,
-    D3D_AL_44,
-    D3D_LVU_655,
-    D3D_XLVU_8888,
-    D3D_QWVU_8888,
-    D3D_ABGR_2101010,
-    D3D_ARGB_2101010,
-    D3D_AWVU_2101010,
-    D3D_GR_1616,
-    D3D_VU_1616,
-    D3D_ABGR_16161616,
-    D3D_R16F,
-    D3D_GR_1616F,
-    D3D_ABGR_16161616F,
-    D3D_R32F,
-    D3D_GR_3232F,
-    D3D_ABGR_32323232F,
-    // Ericsson Texture Compression formats
-    e_etc_RGB_4BPP,
-    //More DirectX 9 Formats
-    D3D_A8 = 0x40,
-    D3D_V8U8,
-    D3D_L16,
-    D3D_L8,
-    D3D_AL_88,
-    D3D_UYVY,
-    D3D_YUY2,
-    // DirectX 10+ Formats
-    DXGI_R32G32B32A32_FLOAT = 0x50,
-    DXGI_R32G32B32A32_UINT,
-    DXGI_R32G32B32A32_SINT,
-    DXGI_R32G32B32_FLOAT,
-    DXGI_R32G32B32_UINT,
-    DXGI_R32G32B32_SINT,
-    DXGI_R16G16B16A16_FLOAT,
-    DXGI_R16G16B16A16_UNORM,
-    DXGI_R16G16B16A16_UINT,
-    DXGI_R16G16B16A16_SNORM,
-    DXGI_R16G16B16A16_SINT,
-    DXGI_R32G32_FLOAT,
-    DXGI_R32G32_UINT,
-    DXGI_R32G32_SINT,
-    DXGI_R10G10B10A2_UNORM,
-    DXGI_R10G10B10A2_UINT,
-    DXGI_R11G11B10_FLOAT,
-    DXGI_R8G8B8A8_UNORM,
-    DXGI_R8G8B8A8_UNORM_SRGB,
-    DXGI_R8G8B8A8_UINT,
-    DXGI_R8G8B8A8_SNORM,
-    DXGI_R8G8B8A8_SINT,
-    DXGI_R16G16_FLOAT,
-    DXGI_R16G16_UNORM,
-    DXGI_R16G16_UINT,
-    DXGI_R16G16_SNORM,
-    DXGI_R16G16_SINT,
-    DXGI_R32_FLOAT,
-    DXGI_R32_UINT,
-    DXGI_R32_SINT,
-    DXGI_R8G8_UNORM,
-    DXGI_R8G8_UINT,
-    DXGI_R8G8_SNORM,
-    DXGI_R8G8_SINT,
-    DXGI_R16_FLOAT,
-    DXGI_R16_UNORM,
-    DXGI_R16_UINT,
-    DXGI_R16_SNORM,
-    DXGI_R16_SINT,
-    DXGI_R8_UNORM,
-    DXGI_R8_UINT,
-    DXGI_R8_SNORM,
-    DXGI_R8_SINT,
-    DXGI_A8_UNORM,
-    DXGI_R1_UNORM,
-    DXGI_R9G9B9E5_SHAREDEXP,
-    DXGI_R8G8_B8G8_UNORM,
-    DXGI_G8R8_G8B8_UNORM,
-    DXGI_BC1_UNORM,
-    DXGI_BC1_UNORM_SRGB,
-    DXGI_BC2_UNORM,
-    DXGI_BC2_UNORM_SRGB,
-    DXGI_BC3_UNORM,
-    DXGI_BC3_UNORM_SRGB,
-    DXGI_BC4_UNORM,				// unimplemented
-    DXGI_BC4_SNORM,				// unimplemented
-    DXGI_BC5_UNORM,				// unimplemented
-    DXGI_BC5_SNORM,				// unimplemented
-    // OpenVG
-    VG_sRGBX_8888  = 0x90,
-    VG_sRGBA_8888,
-    VG_sRGBA_8888_PRE,
-    VG_sRGB_565,
-    VG_sRGBA_5551,
-    VG_sRGBA_4444,
-    VG_sL_8,
-    VG_lRGBX_8888,
-    VG_lRGBA_8888,
-    VG_lRGBA_8888_PRE,
-    VG_lL_8,
-    VG_A_8,
-    VG_BW_1,
-    VG_sXRGB_8888,
-    VG_sARGB_8888,
-    VG_sARGB_8888_PRE,
-    VG_sARGB_1555,
-    VG_sARGB_4444,
-    VG_lXRGB_8888,
-    VG_lARGB_8888,
-    VG_lARGB_8888_PRE,
-    VG_sBGRX_8888,
-    VG_sBGRA_8888,
-    VG_sBGRA_8888_PRE,
-    VG_sBGR_565,
-    VG_sBGRA_5551,
-    VG_sBGRA_4444,
-    VG_lBGRX_8888,
-    VG_lBGRA_8888,
-    VG_lBGRA_8888_PRE,
-    VG_sXBGR_8888,
-    VG_sABGR_8888,
-    VG_sABGR_8888_PRE,
-    VG_sABGR_1555,
-    VG_sABGR_4444,
-    VG_lXBGR_8888,
-    VG_lABGR_8888,
-    VG_lABGR_8888_PRE,
-    NumPixelTypes,
-    InvalidType = 0xffffffff
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrLegacy/pixel_format.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> pixel_format_names {
-    STRING_ENUM_PAIR(PixelFormat,MGL_ARGB_4444),
-    STRING_ENUM_PAIR(PixelFormat,MGL_ARGB_1555),
-    STRING_ENUM_PAIR(PixelFormat,MGL_RGB_565),
-    STRING_ENUM_PAIR(PixelFormat,MGL_RGB_555),
-    STRING_ENUM_PAIR(PixelFormat,MGL_RGB_888),
-    STRING_ENUM_PAIR(PixelFormat,MGL_ARGB_8888),
-    STRING_ENUM_PAIR(PixelFormat,MGL_ARGB_8332),
-    STRING_ENUM_PAIR(PixelFormat,MGL_I_8),
-    STRING_ENUM_PAIR(PixelFormat,MGL_AI_88),
-    STRING_ENUM_PAIR(PixelFormat,MGL_1_BPP),
-    STRING_ENUM_PAIR(PixelFormat,MGL_VY1UY0),
-    STRING_ENUM_PAIR(PixelFormat,MGL_Y1VY0U),
-    STRING_ENUM_PAIR(PixelFormat,MGL_PVRTC2),
-    STRING_ENUM_PAIR(PixelFormat,MGL_PVRTC4),
-    STRING_ENUM_PAIR(PixelFormat,GL_RGBA_4444),
-    STRING_ENUM_PAIR(PixelFormat,GL_RGBA_5551),
-    STRING_ENUM_PAIR(PixelFormat,GL_RGBA_8888),
-    STRING_ENUM_PAIR(PixelFormat,GL_RGB_565),
-    STRING_ENUM_PAIR(PixelFormat,GL_RGB_555),
-    STRING_ENUM_PAIR(PixelFormat,GL_RGB_888),
-    STRING_ENUM_PAIR(PixelFormat,GL_I_8),
-    STRING_ENUM_PAIR(PixelFormat,GL_AI_88),
-    STRING_ENUM_PAIR(PixelFormat,GL_PVRTC2),
-    STRING_ENUM_PAIR(PixelFormat,GL_PVRTC4),
-    STRING_ENUM_PAIR(PixelFormat,GL_BGRA_8888),
-    STRING_ENUM_PAIR(PixelFormat,GL_A_8),
-    STRING_ENUM_PAIR(PixelFormat,GL_PVRTCII4),
-    STRING_ENUM_PAIR(PixelFormat,GL_PVRTCII2),
-    STRING_ENUM_PAIR(PixelFormat,D3D_DXT1),
-    STRING_ENUM_PAIR(PixelFormat,D3D_DXT2),
-    STRING_ENUM_PAIR(PixelFormat,D3D_DXT3),
-    STRING_ENUM_PAIR(PixelFormat,D3D_DXT4),
-    STRING_ENUM_PAIR(PixelFormat,D3D_DXT5),
-    STRING_ENUM_PAIR(PixelFormat,D3D_RGB_332),
-    STRING_ENUM_PAIR(PixelFormat,D3D_AL_44),
-    STRING_ENUM_PAIR(PixelFormat,D3D_LVU_655),
-    STRING_ENUM_PAIR(PixelFormat,D3D_XLVU_8888),
-    STRING_ENUM_PAIR(PixelFormat,D3D_QWVU_8888),
-    STRING_ENUM_PAIR(PixelFormat,D3D_ABGR_2101010),
-    STRING_ENUM_PAIR(PixelFormat,D3D_ARGB_2101010),
-    STRING_ENUM_PAIR(PixelFormat,D3D_AWVU_2101010),
-    STRING_ENUM_PAIR(PixelFormat,D3D_GR_1616),
-    STRING_ENUM_PAIR(PixelFormat,D3D_VU_1616),
-    STRING_ENUM_PAIR(PixelFormat,D3D_ABGR_16161616),
-    STRING_ENUM_PAIR(PixelFormat,D3D_R16F),
-    STRING_ENUM_PAIR(PixelFormat,D3D_GR_1616F),
-    STRING_ENUM_PAIR(PixelFormat,D3D_ABGR_16161616F),
-    STRING_ENUM_PAIR(PixelFormat,D3D_R32F),
-    STRING_ENUM_PAIR(PixelFormat,D3D_GR_3232F),
-    STRING_ENUM_PAIR(PixelFormat,D3D_ABGR_32323232F),
-    STRING_ENUM_PAIR(PixelFormat,e_etc_RGB_4BPP),
-    STRING_ENUM_PAIR(PixelFormat,D3D_A8),
-    STRING_ENUM_PAIR(PixelFormat,D3D_V8U8),
-    STRING_ENUM_PAIR(PixelFormat,D3D_L16),
-    STRING_ENUM_PAIR(PixelFormat,D3D_L8),
-    STRING_ENUM_PAIR(PixelFormat,D3D_AL_88),
-    STRING_ENUM_PAIR(PixelFormat,D3D_UYVY),
-    STRING_ENUM_PAIR(PixelFormat,D3D_YUY2),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32G32B32A32_FLOAT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32G32B32A32_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32G32B32A32_SINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32G32B32_FLOAT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32G32B32_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32G32B32_SINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16G16B16A16_FLOAT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16G16B16A16_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16G16B16A16_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16G16B16A16_SNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16G16B16A16_SINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32G32_FLOAT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32G32_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32G32_SINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R10G10B10A2_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R10G10B10A2_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R11G11B10_FLOAT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8G8B8A8_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8G8B8A8_UNORM_SRGB),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8G8B8A8_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8G8B8A8_SNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8G8B8A8_SINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16G16_FLOAT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16G16_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16G16_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16G16_SNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16G16_SINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32_FLOAT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R32_SINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8G8_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8G8_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8G8_SNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8G8_SINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16_FLOAT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16_SNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R16_SINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8_UINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8_SNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8_SINT),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_A8_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R1_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R9G9B9E5_SHAREDEXP),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_R8G8_B8G8_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_G8R8_G8B8_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_BC1_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_BC1_UNORM_SRGB),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_BC2_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_BC2_UNORM_SRGB),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_BC3_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_BC3_UNORM_SRGB),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_BC4_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_BC4_SNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_BC5_UNORM),
-    STRING_ENUM_PAIR(PixelFormat,DXGI_BC5_SNORM),
-    STRING_ENUM_PAIR(PixelFormat,VG_sRGBX_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_sRGBA_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_sRGBA_8888_PRE),
-    STRING_ENUM_PAIR(PixelFormat,VG_sRGB_565),
-    STRING_ENUM_PAIR(PixelFormat,VG_sRGBA_5551),
-    STRING_ENUM_PAIR(PixelFormat,VG_sRGBA_4444),
-    STRING_ENUM_PAIR(PixelFormat,VG_sL_8),
-    STRING_ENUM_PAIR(PixelFormat,VG_lRGBX_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_lRGBA_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_lRGBA_8888_PRE),
-    STRING_ENUM_PAIR(PixelFormat,VG_lL_8),
-    STRING_ENUM_PAIR(PixelFormat,VG_A_8),
-    STRING_ENUM_PAIR(PixelFormat,VG_BW_1),
-    STRING_ENUM_PAIR(PixelFormat,VG_sXRGB_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_sARGB_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_sARGB_8888_PRE),
-    STRING_ENUM_PAIR(PixelFormat,VG_sARGB_1555),
-    STRING_ENUM_PAIR(PixelFormat,VG_sARGB_4444),
-    STRING_ENUM_PAIR(PixelFormat,VG_lXRGB_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_lARGB_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_lARGB_8888_PRE),
-    STRING_ENUM_PAIR(PixelFormat,VG_sBGRX_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_sBGRA_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_sBGRA_8888_PRE),
-    STRING_ENUM_PAIR(PixelFormat,VG_sBGR_565),
-    STRING_ENUM_PAIR(PixelFormat,VG_sBGRA_5551),
-    STRING_ENUM_PAIR(PixelFormat,VG_sBGRA_4444),
-    STRING_ENUM_PAIR(PixelFormat,VG_lBGRX_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_lBGRA_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_lBGRA_8888_PRE),
-    STRING_ENUM_PAIR(PixelFormat,VG_sXBGR_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_sABGR_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_sABGR_8888_PRE),
-    STRING_ENUM_PAIR(PixelFormat,VG_sABGR_1555),
-    STRING_ENUM_PAIR(PixelFormat,VG_sABGR_4444),
-    STRING_ENUM_PAIR(PixelFormat,VG_lXBGR_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_lABGR_8888),
-    STRING_ENUM_PAIR(PixelFormat,VG_lABGR_8888_PRE)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrLegacy/pixel_format.def"
+    #undef X
   };
   enum API {
-    ApiOGLES = 1,
-    ApiOGLES2,
-    ApiD3DM,
-    ApiOGL,
-    ApiDX9,
-    ApiDX10,
-    ApiOVG,
-    ApiMGL
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrLegacy/api.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> api_names {
-    STRING_ENUM_PAIR(API,ApiOGLES),
-    STRING_ENUM_PAIR(API,ApiOGLES2),
-    STRING_ENUM_PAIR(API,ApiD3DM),
-    STRING_ENUM_PAIR(API,ApiOGL),
-    STRING_ENUM_PAIR(API,ApiDX9),
-    STRING_ENUM_PAIR(API,ApiDX10),
-    STRING_ENUM_PAIR(API,ApiOVG),
-    STRING_ENUM_PAIR(API,ApiMGL)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrLegacy/api.def"
+    #undef X
   };
   enum Flags {
-    MIP_MAP         = (1 << 8),  // Texture has MIP Map levels
-    BUMP_MAP        = (1 << 10), // Texture has normals encoded for a bump map
-    CUBE_MAP        = (1 << 12), // Texture is a cubemap/skybox
-    VOLUME_TEXTURE  = (1 << 14), // Texture is a 3D texture
-    HAS_ALPHA       = (1 << 15), // Texture has transparency
-    VERTICAL_FLIP   = (1 << 16)  // Texture is vertically flipped
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrLegacy/flags.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> flag_names {
-    STRING_ENUM_PAIR(Flags,MIP_MAP),
-    STRING_ENUM_PAIR(Flags,BUMP_MAP),
-    STRING_ENUM_PAIR(Flags,CUBE_MAP),
-    STRING_ENUM_PAIR(Flags,VOLUME_TEXTURE),
-    STRING_ENUM_PAIR(Flags,HAS_ALPHA),
-    STRING_ENUM_PAIR(Flags,VERTICAL_FLIP)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrLegacy/flags.def"
+    #undef X
   };
   std::string PrintFlagNames(unsigned int flags) {
     std::string output;
-    if(flags&Flags::MIP_MAP) output.append(flag_names.find(Flags::MIP_MAP)->second + "|");
-    if(flags&Flags::BUMP_MAP) output.append(flag_names.find(Flags::BUMP_MAP)->second + "|");
-    if(flags&Flags::CUBE_MAP) output.append(flag_names.find(Flags::CUBE_MAP)->second + "|");
-    if(flags&Flags::VOLUME_TEXTURE) output.append(flag_names.find(Flags::VOLUME_TEXTURE)->second + "|");
-    if(flags&Flags::HAS_ALPHA) output.append(flag_names.find(Flags::HAS_ALPHA)->second + "|");
-    if(flags&Flags::VERTICAL_FLIP) output.append(flag_names.find(Flags::VERTICAL_FLIP)->second + "|");
+    #define X(a,b) ENUM_APPEND_TO_STRING(a)
+    #include "defs/pvrLegacy/flags.def"
+    #undef X
     return output;
   };
   const std::uint32_t kPixelTypeMask = 0xff;
@@ -508,73 +183,14 @@ private:
 
 namespace PvrV3Info {
   enum CompressedFormat {
-    PVRTCI_2bpp_RGB,
-    PVRTCI_2bpp_RGBA,
-    PVRTCI_4bpp_RGB,
-    PVRTCI_4bpp_RGBA,
-    PVRTCII_2bpp,
-    PVRTCII_4bpp,
-    ETC1,
-    DXT1,
-    DXT2,
-    DXT3,
-    DXT4,
-    DXT5,
-    //These formats are identical to some DXT formats.
-    BC1 = DXT1,
-    BC2 = DXT3,
-    BC3 = DXT5,
-    //These are currently unsupported:
-    BC4,
-    BC5,
-    BC6,
-    BC7,
-    //These are supported
-    UYVY,
-    YUY2,
-    BW1bpp,
-    SharedExponentR9G9B9E5,
-    RGBG8888,
-    GRGB8888,
-    ETC2_RGB,
-    ETC2_RGBA,
-    ETC2_RGB_A1,
-    EAC_R11,
-    EAC_RG11,
-    //Invalid value
-    NumCompressedPFs
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrV3/compressed_formats.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> compressed_format_names {
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_2bpp_RGB),
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_2bpp_RGBA),
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_4bpp_RGB),
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_4bpp_RGBA),
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCII_2bpp),
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCII_4bpp),
-  STRING_ENUM_PAIR(CompressedFormat,ETC1),
-  STRING_ENUM_PAIR(CompressedFormat,DXT1),
-  STRING_ENUM_PAIR(CompressedFormat,DXT2),
-  STRING_ENUM_PAIR(CompressedFormat,DXT3),
-  STRING_ENUM_PAIR(CompressedFormat,DXT4),
-  STRING_ENUM_PAIR(CompressedFormat,DXT5),
-  STRING_ENUM_PAIR(CompressedFormat,BC1),
-  STRING_ENUM_PAIR(CompressedFormat,BC2),
-  STRING_ENUM_PAIR(CompressedFormat,BC3),
-  STRING_ENUM_PAIR(CompressedFormat,BC4),
-  STRING_ENUM_PAIR(CompressedFormat,BC5),
-  STRING_ENUM_PAIR(CompressedFormat,BC6),
-  STRING_ENUM_PAIR(CompressedFormat,BC7),
-  STRING_ENUM_PAIR(CompressedFormat,UYVY),
-  STRING_ENUM_PAIR(CompressedFormat,YUY2),
-  STRING_ENUM_PAIR(CompressedFormat,BW1bpp),
-  STRING_ENUM_PAIR(CompressedFormat,SharedExponentR9G9B9E5),
-  STRING_ENUM_PAIR(CompressedFormat,RGBG8888),
-  STRING_ENUM_PAIR(CompressedFormat,GRGB8888),
-  STRING_ENUM_PAIR(CompressedFormat,ETC2_RGB),
-  STRING_ENUM_PAIR(CompressedFormat,ETC2_RGBA),
-  STRING_ENUM_PAIR(CompressedFormat,ETC2_RGB_A1),
-  STRING_ENUM_PAIR(CompressedFormat,EAC_R11),
-  STRING_ENUM_PAIR(CompressedFormat,EAC_RG11)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrV3/compressed_formats.def"
+    #undef X
   };
   enum {
     PVRv3 = 0x03525650, //!< PVR format v3 identifier
@@ -586,48 +202,24 @@ namespace PvrV3Info {
     SizeOfHeader = 52
   };
   enum ColorSpace {
-    lRGB,
-    sRGB,
-    NumSpaces
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrV3/colour_spaces.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> color_space_names {
-    STRING_ENUM_PAIR(ColorSpace,lRGB),
-    STRING_ENUM_PAIR(ColorSpace,sRGB)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrV3/colour_spaces.def"
+    #undef X
   };
   enum VariableType {
-    UnsignedByteNorm,
-    SignedByteNorm,
-    UnsignedByte,
-    SignedByte,
-    UnsignedShortNorm,
-    SignedShortNorm,
-    UnsignedShort,
-    SignedShort,
-    UnsignedIntegerNorm,
-    SignedIntegerNorm,
-    UnsignedInteger,
-    SignedInteger,
-    SignedFloat,
-    Float = SignedFloat,
-    UnsignedFloat,
-    NumVarTypes
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrV3/variable_types.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> variable_type_names {
-    STRING_ENUM_PAIR(VariableType,UnsignedByteNorm),
-    STRING_ENUM_PAIR(VariableType,SignedByteNorm),
-    STRING_ENUM_PAIR(VariableType,UnsignedByte),
-    STRING_ENUM_PAIR(VariableType,SignedByte),
-    STRING_ENUM_PAIR(VariableType,UnsignedShortNorm),
-    STRING_ENUM_PAIR(VariableType,SignedShortNorm),
-    STRING_ENUM_PAIR(VariableType,UnsignedShort),
-    STRING_ENUM_PAIR(VariableType,SignedShort),
-    STRING_ENUM_PAIR(VariableType,UnsignedIntegerNorm),
-    STRING_ENUM_PAIR(VariableType,SignedIntegerNorm),
-    STRING_ENUM_PAIR(VariableType,UnsignedInteger),
-    STRING_ENUM_PAIR(VariableType,SignedInteger),
-    STRING_ENUM_PAIR(VariableType,SignedFloat),
-    STRING_ENUM_PAIR(VariableType,Float),
-    STRING_ENUM_PAIR(VariableType,UnsignedFloat)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrV3/variable_types.def"
+    #undef X
   };
   
   std::vector<std::string> column_names {
