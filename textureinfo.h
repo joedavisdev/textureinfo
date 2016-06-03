@@ -183,73 +183,14 @@ private:
 
 namespace PvrV3Info {
   enum CompressedFormat {
-    PVRTCI_2bpp_RGB,
-    PVRTCI_2bpp_RGBA,
-    PVRTCI_4bpp_RGB,
-    PVRTCI_4bpp_RGBA,
-    PVRTCII_2bpp,
-    PVRTCII_4bpp,
-    ETC1,
-    DXT1,
-    DXT2,
-    DXT3,
-    DXT4,
-    DXT5,
-    //These formats are identical to some DXT formats.
-    BC1 = DXT1,
-    BC2 = DXT3,
-    BC3 = DXT5,
-    //These are currently unsupported:
-    BC4,
-    BC5,
-    BC6,
-    BC7,
-    //These are supported
-    UYVY,
-    YUY2,
-    BW1bpp,
-    SharedExponentR9G9B9E5,
-    RGBG8888,
-    GRGB8888,
-    ETC2_RGB,
-    ETC2_RGBA,
-    ETC2_RGB_A1,
-    EAC_R11,
-    EAC_RG11,
-    //Invalid value
-    NumCompressedPFs
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrV3/compressed_formats.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> compressed_format_names {
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_2bpp_RGB),
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_2bpp_RGBA),
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_4bpp_RGB),
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCI_4bpp_RGBA),
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCII_2bpp),
-  STRING_ENUM_PAIR(CompressedFormat,PVRTCII_4bpp),
-  STRING_ENUM_PAIR(CompressedFormat,ETC1),
-  STRING_ENUM_PAIR(CompressedFormat,DXT1),
-  STRING_ENUM_PAIR(CompressedFormat,DXT2),
-  STRING_ENUM_PAIR(CompressedFormat,DXT3),
-  STRING_ENUM_PAIR(CompressedFormat,DXT4),
-  STRING_ENUM_PAIR(CompressedFormat,DXT5),
-  STRING_ENUM_PAIR(CompressedFormat,BC1),
-  STRING_ENUM_PAIR(CompressedFormat,BC2),
-  STRING_ENUM_PAIR(CompressedFormat,BC3),
-  STRING_ENUM_PAIR(CompressedFormat,BC4),
-  STRING_ENUM_PAIR(CompressedFormat,BC5),
-  STRING_ENUM_PAIR(CompressedFormat,BC6),
-  STRING_ENUM_PAIR(CompressedFormat,BC7),
-  STRING_ENUM_PAIR(CompressedFormat,UYVY),
-  STRING_ENUM_PAIR(CompressedFormat,YUY2),
-  STRING_ENUM_PAIR(CompressedFormat,BW1bpp),
-  STRING_ENUM_PAIR(CompressedFormat,SharedExponentR9G9B9E5),
-  STRING_ENUM_PAIR(CompressedFormat,RGBG8888),
-  STRING_ENUM_PAIR(CompressedFormat,GRGB8888),
-  STRING_ENUM_PAIR(CompressedFormat,ETC2_RGB),
-  STRING_ENUM_PAIR(CompressedFormat,ETC2_RGBA),
-  STRING_ENUM_PAIR(CompressedFormat,ETC2_RGB_A1),
-  STRING_ENUM_PAIR(CompressedFormat,EAC_R11),
-  STRING_ENUM_PAIR(CompressedFormat,EAC_RG11)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrV3/compressed_formats.def"
+    #undef X
   };
   enum {
     PVRv3 = 0x03525650, //!< PVR format v3 identifier
@@ -261,48 +202,24 @@ namespace PvrV3Info {
     SizeOfHeader = 52
   };
   enum ColorSpace {
-    lRGB,
-    sRGB,
-    NumSpaces
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrV3/colour_spaces.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> color_space_names {
-    STRING_ENUM_PAIR(ColorSpace,lRGB),
-    STRING_ENUM_PAIR(ColorSpace,sRGB)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrV3/colour_spaces.def"
+    #undef X
   };
   enum VariableType {
-    UnsignedByteNorm,
-    SignedByteNorm,
-    UnsignedByte,
-    SignedByte,
-    UnsignedShortNorm,
-    SignedShortNorm,
-    UnsignedShort,
-    SignedShort,
-    UnsignedIntegerNorm,
-    SignedIntegerNorm,
-    UnsignedInteger,
-    SignedInteger,
-    SignedFloat,
-    Float = SignedFloat,
-    UnsignedFloat,
-    NumVarTypes
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/pvrV3/variable_types.def"
+    #undef X
   };
   std::multimap<unsigned int,std::string> variable_type_names {
-    STRING_ENUM_PAIR(VariableType,UnsignedByteNorm),
-    STRING_ENUM_PAIR(VariableType,SignedByteNorm),
-    STRING_ENUM_PAIR(VariableType,UnsignedByte),
-    STRING_ENUM_PAIR(VariableType,SignedByte),
-    STRING_ENUM_PAIR(VariableType,UnsignedShortNorm),
-    STRING_ENUM_PAIR(VariableType,SignedShortNorm),
-    STRING_ENUM_PAIR(VariableType,UnsignedShort),
-    STRING_ENUM_PAIR(VariableType,SignedShort),
-    STRING_ENUM_PAIR(VariableType,UnsignedIntegerNorm),
-    STRING_ENUM_PAIR(VariableType,SignedIntegerNorm),
-    STRING_ENUM_PAIR(VariableType,UnsignedInteger),
-    STRING_ENUM_PAIR(VariableType,SignedInteger),
-    STRING_ENUM_PAIR(VariableType,SignedFloat),
-    STRING_ENUM_PAIR(VariableType,Float),
-    STRING_ENUM_PAIR(VariableType,UnsignedFloat)
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/pvrV3/variable_types.def"
+    #undef X
   };
   
   std::vector<std::string> column_names {
