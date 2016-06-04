@@ -347,6 +347,17 @@ namespace KTXInfo {
   // Identifier for the orientation meta data
   static const std::uint8_t kOrientationMetaDataKey[] = "KTXOrientation";
   
+  enum GLType {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/ktx/gl_types.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> gl_type_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/ktx/gl_types.def"
+    #undef X
+  };
+  
   std::vector<std::string> column_names {
     "glFormat",
     "glInternalFormat",
@@ -382,7 +393,9 @@ public:
     output.push_back(std::to_string(impl.gl_format));
     output.push_back(std::to_string(impl.gl_internal_format));
     output.push_back(std::to_string(impl.gl_base_internal_format));
-    output.push_back(std::to_string(impl.gl_type));
+    std::string gl_type_string("0 (compressed format)");
+    if(impl.gl_type != 0) gl_type_string = KTXInfo::gl_type_names.find(impl.gl_type)->second;
+    output.push_back(gl_type_string);
     output.push_back(std::to_string(impl.gl_type_size));
     output.push_back(std::to_string(impl.pixel_width));
     output.push_back(std::to_string(impl.pixel_height));
