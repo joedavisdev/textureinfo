@@ -367,6 +367,16 @@ namespace KTXInfo {
     #include "defs/ktx/gl_formats.def"
     #undef X
   };
+  enum GLInternalFormat {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/ktx/gl_internal_formats.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> gl_internal_format_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/ktx/gl_internal_formats.def"
+    #undef X
+  };
   
   std::vector<std::string> column_names {
     "glFormat",
