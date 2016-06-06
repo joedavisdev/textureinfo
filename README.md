@@ -7,14 +7,6 @@ A simple command-line utility for inspecting texture file header data. Currently
 	* v1 & v2 (a.k.a. legacy)
 	* v3
 
-# Binaries
-
-| OS (target) |
-| :------ |
-| [Windows (x86 32-bit)](https://www.dropbox.com/s/muqnxd7ezdi78le/textureinfo.exe?dl=0) |
-| [OS X (x86 64-bit)](https://www.dropbox.com/s/invszufmdom2pdc/textureinfo?dl=0) |
-| [Linux (x86 64-bit)](https://www.dropbox.com/s/w822vy8ftsj5zc4/textureinfo?dl=0) |
-
 # Build health
 
 | Branch  | Status |
