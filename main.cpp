@@ -12,7 +12,7 @@
 //*-------------------------------
 // Global variables
 //-------------------------------*/
-static const std::string s_version = "1.1.0";
+static const std::string s_version = "1.1.1";
 namespace Defaults {
   enum Types {
     PVRV3,
