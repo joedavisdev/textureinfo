@@ -347,34 +347,14 @@ namespace KTXInfo {
   // Identifier for the orientation meta data
   static const std::uint8_t kOrientationMetaDataKey[] = "KTXOrientation";
   
-  enum GLType {
+  enum GLEnum {
     #define X(a,b) ENUM_DEF(a,b)
-    #include "defs/ktx/gl_types.def"
+    #include "defs/ktx/gl.def"
     #undef X
   };
-  std::multimap<unsigned int,std::string> gl_type_names {
+  std::multimap<unsigned int,std::string> gl_enum_names {
     #define X(a,b) ENUM_STRING_PAIR(a)
-    #include "defs/ktx/gl_types.def"
-    #undef X
-  };
-  enum GLFormat {
-    #define X(a,b) ENUM_DEF(a,b)
-    #include "defs/ktx/gl_formats.def"
-    #undef X
-  };
-  std::multimap<unsigned int,std::string> gl_format_names {
-    #define X(a,b) ENUM_STRING_PAIR(a)
-    #include "defs/ktx/gl_formats.def"
-    #undef X
-  };
-  enum GLInternalFormat {
-    #define X(a,b) ENUM_DEF(a,b)
-    #include "defs/ktx/gl_internal_formats.def"
-    #undef X
-  };
-  std::multimap<unsigned int,std::string> gl_internal_format_names {
-    #define X(a,b) ENUM_STRING_PAIR(a)
-    #include "defs/ktx/gl_internal_formats.def"
+    #include "defs/ktx/gl.def"
     #undef X
   };
   
@@ -411,12 +391,14 @@ public:
     std::vector<std::string> output;
     const auto& impl(this->impl_);
     std::string gl_format_string("0 (compressed format)");
-    if(impl.gl_format != 0) gl_format_string = KTXInfo::gl_format_names.find(impl.gl_format)->second;
+    if(impl.gl_format != 0) gl_format_string = KTXInfo::gl_enum_names.find(impl.gl_format)->second;
     output.push_back(gl_format_string);
-    output.push_back(std::to_string(impl.gl_internal_format));
-    output.push_back(std::to_string(impl.gl_base_internal_format));
+    std::string gl_internal_format_string(KTXInfo::gl_enum_names.find(impl.gl_internal_format)->second);
+    output.push_back(gl_internal_format_string);
+    std::string gl_base_internal_format_string(KTXInfo::gl_enum_names.find(impl.gl_base_internal_format)->second);
+    output.push_back(gl_base_internal_format_string);
     std::string gl_type_string("0 (compressed format)");
-    if(impl.gl_type != 0) gl_type_string = KTXInfo::gl_type_names.find(impl.gl_type)->second;
+    if(impl.gl_type != 0) gl_type_string = KTXInfo::gl_enum_names.find(impl.gl_type)->second;
     output.push_back(gl_type_string);
     output.push_back(std::to_string(impl.gl_type_size));
     output.push_back(std::to_string(impl.pixel_width));
