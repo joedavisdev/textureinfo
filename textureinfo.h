@@ -22,6 +22,8 @@
 #define ENUM_STRING_PAIR(enum__) {enum__,#enum__},
 #define ENUM_APPEND_TO_STRING(enum__) \
   if(flags&enum__) output.append(flag_names.find(enum__)->second + "|");
+#define ENUM_STRING_LOOKUP(vector__,enum__) \
+  vector__.find(enum__)->second == ""?std::to_string(enum__)+" (no string found)":vector__.find(enum__)->second
 
 //*-------------------------------
 // Constants
@@ -391,14 +393,14 @@ public:
     std::vector<std::string> output;
     const auto& impl(this->impl_);
     std::string gl_format_string("0 (compressed format)");
-    if(impl.gl_format != 0) gl_format_string = KTXInfo::gl_enum_names.find(impl.gl_format)->second;
+    if(impl.gl_format != 0) gl_format_string = ENUM_STRING_LOOKUP(KTXInfo::gl_enum_names,impl.gl_format);
     output.push_back(gl_format_string);
-    std::string gl_internal_format_string(KTXInfo::gl_enum_names.find(impl.gl_internal_format)->second);
+    std::string gl_internal_format_string(ENUM_STRING_LOOKUP(KTXInfo::gl_enum_names,impl.gl_internal_format));
     output.push_back(gl_internal_format_string);
-    std::string gl_base_internal_format_string(KTXInfo::gl_enum_names.find(impl.gl_base_internal_format)->second);
+    std::string gl_base_internal_format_string(ENUM_STRING_LOOKUP(KTXInfo::gl_enum_names,impl.gl_base_internal_format));
     output.push_back(gl_base_internal_format_string);
     std::string gl_type_string("0 (compressed format)");
-    if(impl.gl_type != 0) gl_type_string = KTXInfo::gl_enum_names.find(impl.gl_type)->second;
+    if(impl.gl_type != 0) gl_type_string = ENUM_STRING_LOOKUP(KTXInfo::gl_enum_names,impl.gl_type);
     output.push_back(gl_type_string);
     output.push_back(std::to_string(impl.gl_type_size));
     output.push_back(std::to_string(impl.pixel_width));
