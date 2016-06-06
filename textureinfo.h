@@ -264,7 +264,7 @@ private:
         // Convert unsigned int pulled from the header into a literal character
         char value_char(impl.pixel_format.u8[index]);
         if(!value_char) value_char = c_empty_string[0];
-        const std::string value((char*)&value_char);
+        const std::string value((char*)&value_char,1);
         output.push_back(value);
       }
       // Bits per-pixel
