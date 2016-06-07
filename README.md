@@ -19,9 +19,18 @@ A simple command-line utility for inspecting texture file header data. Currently
 
 # Building
 
+## Dependencies
+
+* Cmake 3.0 or better
+
 ## Linux & OS X script build
-````bash
+````
 ./build.sh
+````
+
+## Windows script build
+````
+./build.bat
 ````
 
 ## Manual build
