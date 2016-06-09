@@ -24,6 +24,11 @@
   if(flags&enum__) output.append(flag_names.find(enum__)->second + "|");
 #define ENUM_STRING_LOOKUP(vector__,enum__) \
   vector__.find(enum__)->second == ""?std::to_string(enum__)+" (no string found)":vector__.find(enum__)->second
+#define MAKEFOURCC(C0__,C1__,C2__,C3__) \
+  (static_cast<std::uint32_t>(C0__)) \
+  + (static_cast<std::uint32_t>(C1__) << 8) \
+  + (static_cast<std::uint32_t>(C2__) << 16) \
+  + (static_cast<std::uint32_t>(C3__) << 24)
 
 //*-------------------------------
 // Constants
@@ -444,5 +449,131 @@ private:
     std::uint32_t number_of_mipmap_levels;
     std::uint32_t bytes_of_key_value_data;
     Impl() {memset(this, 0, sizeof(Impl));}
+  }impl_;
+};
+
+namespace DDSInfo {
+  enum PixelFormatFlags {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/pixel_format_flags.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> pixel_format_flag_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/pixel_format_flags.def"
+    #undef X
+  };
+  enum DDSFlags {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/dds_flags.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> dds_flag_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/dds_flags.def"
+    #undef X
+  };
+  enum Capabilities1Flags {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/caps_1_flags.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> capabilities1_flag_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/caps_1_flags.def"
+    #undef X
+  };
+  enum Capabilities2Flags {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/caps_2_flags.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> capabilities2_flag_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/caps_2_flags.def"
+    #undef X
+  };
+  enum TextureDimension {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/texture_dimension.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> texture_dimension_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/texture_dimension.def"
+    #undef X
+  };
+  enum TextureMiscFlags {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/texture_misc_flags.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> texture_misc_flag_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/texture_misc_flags.def"
+    #undef X
+  };
+  enum TextureMiscFlags2 {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/texture_misc_flags_2.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> texture_misc_flag_2_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/texture_misc_flags_2.def"
+    #undef X
+  };
+  enum D3DFormat {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/d3d_formats.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> d3d_format_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/d3d_formats.def"
+    #undef X
+  };
+  enum DXGIFormat {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/dxgi_format.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> dxgi_format_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/dxgi_format.def"
+    #undef X
+  };
+  
+  static const std::uint32_t kExpectedPixelFormatSize = 32;
+}
+class DDSHeader: public IHeader {
+public:
+private:
+  struct PixelFormat {
+    std::uint32_t size;
+    std::uint32_t flags;
+    std::uint32_t fourcc;
+    std::uint32_t bit_count;
+    std::uint32_t red_mask;
+    std::uint32_t green_mask;
+    std::uint32_t blue_mask;
+    std::uint32_t alpha_mask;
+  };
+  #pragma pack(4)
+  struct Impl {
+    std::uint32_t size;
+    std::uint32_t flags;
+    std::uint32_t height;
+    std::uint32_t width;
+    std::uint32_t pitch_or_linear_size;
+    std::uint32_t depth;
+    std::uint32_t mip_map_count;
+    std::uint32_t reserved[11];
+    PixelFormat   pixel_format;
+    std::uint32_t capabilities1;
+    std::uint32_t capabilities2;
+    std::uint32_t capabilities3;
+    std::uint32_t capabilities4;
+    std::uint32_t reserved2;
   }impl_;
 };

@@ -1,0 +1,8 @@
+X(e_Capabilities,=0x00000001)
+X(e_height,=0x00000002)
+X(e_width,=0x00000004)
+X(e_pitch,=0x00000008)
+X(e_pixelFormat,=0x00001000)
+X(e_mipMapCount,=0x00020000)
+X(e_linearSize,=0x00080000)
+X(e_depth,=0x00800000)
