@@ -1,0 +1,8 @@
+X(e_alphaPixels,=0x00000001)
+X(e_alpha,=0x00000002)
+X(e_fourCC,=0x00000004)
+X(e_rgb,=0x00000040)
+X(e_yuv,=0x00000200)
+X(e_luminance,=0x00020000)
+X(e_unknownBump1,=0x00040000)
+X(e_unknownBump2,=0x00080000)
