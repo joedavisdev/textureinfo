@@ -545,8 +545,30 @@ namespace DDSInfo {
   };
   
   static const std::uint32_t kExpectedPixelFormatSize = 32;
+  static const std::uint32_t kIdentifier = 0x20534444; // "DDS "
+  static const std::uint32_t kExpectedDDSSize = 124;
+  
+  std::vector<std::string> column_names {};
 }
 class DDSHeader: public IHeader {
+public:
+  virtual bool LoadHeader(std::ifstream& file, std::string& error_string) {
+    HEADER_PRE_LOAD(file)
+    std::uint32_t identifier;
+    file.read(reinterpret_cast<char*>(&identifier), sizeof(identifier));
+    if(identifier != DDSInfo::kIdentifier) {
+      error_string = "Header does not contain a valid DDS identifier";
+      return false;
+    }
+    bool has_dx10_header = (impl_.pixel_format.flags & DDSInfo::e_fourCC) &&
+	                     impl_.pixel_format.fourcc == MAKEFOURCC('D', 'X', '1', '0');
+    if(has_dx10_header)
+      file.read(reinterpret_cast<char*>(&this->dx10_impl_), sizeof(this->dx10_impl_));
+    file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
+    HEADER_POST_LOAD(file)
+  }
+  virtual std::string ToString() {assert(0);}
+  virtual std::string ToCsvString() {assert(0);}
 public:
 private:
   struct PixelFormat {
@@ -576,4 +598,12 @@ private:
     std::uint32_t capabilities4;
     std::uint32_t reserved2;
   }impl_;
+  #pragma pack(4)
+  struct FileHeaderDX10 {
+    std::uint32_t dxgi_format;
+    std::uint32_t resource_dimension;
+    std::uint32_t misc_flags;
+    std::uint32_t array_size;
+    std::uint32_t misc_flags_2;
+  }dx10_impl_;
 };
