@@ -548,7 +548,34 @@ namespace DDSInfo {
   static const std::uint32_t kIdentifier = 0x20534444; // "DDS "
   static const std::uint32_t kExpectedDDSSize = 124;
   
-  std::vector<std::string> column_names {};
+  std::vector<std::string> column_names {
+  "Pixel format (size)",
+  "Pixel format (flags)",
+  "Pixel format (fourcc)",
+  "Pixel format (bit count)",
+  "Pixel format (red mask)",
+  "Pixel format (blue mask)",
+  "Pixel format (green mask)",
+  "Pixel format (alpha mask)",
+  "Size",
+  "Flags",
+  "Width",
+  "Height",
+  "Depth",
+  "Number of MIP maps",
+  "Pitch or linear size",
+  "Capabilities (1)",
+  "Capabilities (2)",
+  "Capabilities (3)",
+  "Capabilities (4)",
+  "Reserved",
+  "Reserved (2)",
+  "DX10: Format",
+  "DX10: Dimension",
+  "DX10: Array size",
+  "DX10: Flags (1)",
+  "DX10: Flags (2)"
+  };
 }
 class DDSHeader: public IHeader {
 public:
@@ -567,8 +594,57 @@ public:
     file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
     HEADER_POST_LOAD(file)
   }
-  virtual std::string ToString() {assert(0);}
-  virtual std::string ToCsvString() {assert(0);}
+  std::vector<std::string> ToStringArray() {
+    std::vector<std::string> output;
+    const auto& impl(this->impl_);
+    const auto& dx10_impl(this->dx10_impl_);
+    output.push_back(std::to_string(impl.pixel_format.size));
+    output.push_back(std::to_string(impl.pixel_format.flags));
+    output.push_back(std::to_string(impl.pixel_format.fourcc));
+    output.push_back(std::to_string(impl.pixel_format.bit_count));
+    output.push_back(std::to_string(impl.pixel_format.red_mask));
+    output.push_back(std::to_string(impl.pixel_format.blue_mask));
+    output.push_back(std::to_string(impl.pixel_format.green_mask));
+    output.push_back(std::to_string(impl.pixel_format.alpha_mask));
+    output.push_back(std::to_string(impl.size));
+    output.push_back(std::to_string(impl.flags));
+    output.push_back(std::to_string(impl.width));
+    output.push_back(std::to_string(impl.height));
+    output.push_back(std::to_string(impl.depth));
+    output.push_back(std::to_string(impl.mip_map_count));
+    output.push_back(std::to_string(impl.pitch_or_linear_size));
+    output.push_back(std::to_string(impl.capabilities1));
+    output.push_back(std::to_string(impl.capabilities2));
+    output.push_back(std::to_string(impl.capabilities3));
+    output.push_back(std::to_string(impl.capabilities4));
+    std::string reserved;
+    for(auto& value: impl.reserved) {
+      reserved.append(std::to_string(value) + ':');
+    }
+    output.push_back(reserved);
+    output.push_back(std::to_string(impl.reserved2));
+    // DX 10
+    output.push_back(std::to_string(dx10_impl.dxgi_format));
+    output.push_back(std::to_string(dx10_impl.resource_dimension));
+    output.push_back(std::to_string(dx10_impl.array_size));
+    output.push_back(std::to_string(dx10_impl.misc_flags));
+    output.push_back(std::to_string(dx10_impl.misc_flags_2));
+    return output;
+    }
+  virtual std::string ToString() {
+    std::string output("");
+    const auto& variable_strings(this->ToStringArray());
+    for(unsigned int index=0; index<DDSInfo::column_names.size();++index)
+      output.append(DDSInfo::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
+    return output;
+  }
+  virtual std::string ToCsvString() {
+    std::string output("");
+    const auto& variable_strings(this->ToStringArray());
+    for(const auto& variable_string:variable_strings)
+      output.append(variable_string + ',');
+    return output;
+  }
 public:
 private:
   struct PixelFormat {
