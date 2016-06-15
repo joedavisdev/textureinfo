@@ -20,8 +20,8 @@
 
 #define ENUM_DEF(enum__, value__) enum__ value__,
 #define ENUM_STRING_PAIR(enum__) {enum__,#enum__},
-#define ENUM_APPEND_TO_STRING(enum__) \
-  if(flags&enum__) output.append(flag_names.find(enum__)->second + "|");
+#define ENUM_APPEND_TO_STRING(enum__,string_vector__) \
+  if(flags&enum__) output.append(string_vector__.find(enum__)->second + "|");
 #define ENUM_STRING_LOOKUP(vector__,enum__) \
   vector__.find(enum__)->second == ""?std::to_string(enum__)+" (no string found)":vector__.find(enum__)->second
 #define MAKEFOURCC(C0__,C1__,C2__,C3__) \
@@ -81,7 +81,7 @@ namespace PvrLegacyInfo {
   };
   std::string PrintFlagNames(unsigned int flags) {
     std::string output;
-    #define X(a,b) ENUM_APPEND_TO_STRING(a)
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,flag_names)
     #include "defs/pvrLegacy/flags.def"
     #undef X
     return output;
@@ -543,6 +543,20 @@ namespace DDSInfo {
     #include "defs/dds/dxgi_format.def"
     #undef X
   };
+  std::string PrintPixelFormatFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,pixel_format_flag_names)
+    #include "defs/dds/pixel_format_flags.def"
+    #undef X
+    return output;
+  };
+  std::string PrintDDSFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,dds_flag_names)
+    #include "defs/dds/dds_flags.def"
+    #undef X
+    return output;
+  };
   
   static const std::uint32_t kExpectedPixelFormatSize = 32;
   static const std::uint32_t kIdentifier = 0x20534444; // "DDS "
@@ -599,7 +613,7 @@ public:
     const auto& impl(this->impl_);
     const auto& dx10_impl(this->dx10_impl_);
     output.push_back(std::to_string(impl.pixel_format.size));
-    output.push_back(std::to_string(impl.pixel_format.flags));
+    output.push_back(DDSInfo::PrintPixelFormatFlagNames(impl.pixel_format.flags));
     output.push_back(std::to_string(impl.pixel_format.fourcc));
     output.push_back(std::to_string(impl.pixel_format.bit_count));
     output.push_back(std::to_string(impl.pixel_format.red_mask));
@@ -607,7 +621,7 @@ public:
     output.push_back(std::to_string(impl.pixel_format.green_mask));
     output.push_back(std::to_string(impl.pixel_format.alpha_mask));
     output.push_back(std::to_string(impl.size));
-    output.push_back(std::to_string(impl.flags));
+    output.push_back(DDSInfo::PrintDDSFlagNames(impl.flags));
     output.push_back(std::to_string(impl.width));
     output.push_back(std::to_string(impl.height));
     output.push_back(std::to_string(impl.depth));
