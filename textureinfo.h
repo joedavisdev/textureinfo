@@ -31,6 +31,7 @@
   + (static_cast<std::uint32_t>(C3__) << 24)
 
 static void RemoveTrailingCharacter(std::string& string, const char character) {
+  if(string.size()==0) return;
   const unsigned int end_index(string.size()-1);
   if(string.at(end_index)==character) string.erase(end_index);
 }
@@ -504,7 +505,7 @@ namespace DDSInfo {
     #include "defs/dds/texture_dimension.def"
     #undef X
   };
-  std::multimap<unsigned int,std::string> texture_dimension_names {
+  std::multimap<unsigned int,std::string> resource_dimension_names {
     #define X(a,b) ENUM_STRING_PAIR(a)
     #include "defs/dds/texture_dimension.def"
     #undef X
@@ -565,6 +566,62 @@ namespace DDSInfo {
     RemoveTrailingCharacter(output,'|');
     return output;
   };
+  std::string PrintCaps1FlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,capabilities1_flag_names)
+    #include "defs/dds/caps_1_flags.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintCaps2FlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,capabilities2_flag_names)
+    #include "defs/dds/caps_2_flags.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintD3DFormatFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,d3d_format_names)
+    #include "defs/dds/d3d_formats.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintDXGIFormatFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,dxgi_format_names)
+    #include "defs/dds/dxgi_format.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintResourceDimensionFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,resource_dimension_names)
+    #include "defs/dds/texture_dimension.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintTexMiscFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,texture_misc_flag_names)
+    #include "defs/dds/texture_misc_flags.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintTexMisc2FlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,texture_misc_flag_2_names)
+    #include "defs/dds/texture_misc_flags_2.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
   
   static const std::uint32_t kExpectedPixelFormatSize = 32;
   static const std::uint32_t kIdentifier = 0x20534444; // "DDS "
@@ -635,8 +692,8 @@ public:
     output.push_back(std::to_string(impl.depth));
     output.push_back(std::to_string(impl.mip_map_count));
     output.push_back(std::to_string(impl.pitch_or_linear_size));
-    output.push_back(std::to_string(impl.capabilities1));
-    output.push_back(std::to_string(impl.capabilities2));
+    output.push_back(DDSInfo::PrintCaps1FlagNames(impl.capabilities1));
+    output.push_back(DDSInfo::PrintCaps2FlagNames(impl.capabilities2));
     output.push_back(std::to_string(impl.capabilities3));
     output.push_back(std::to_string(impl.capabilities4));
     std::string reserved;
@@ -647,11 +704,11 @@ public:
     output.push_back(reserved);
     output.push_back(std::to_string(impl.reserved2));
     // DX 10
-    output.push_back(std::to_string(dx10_impl.dxgi_format));
-    output.push_back(std::to_string(dx10_impl.resource_dimension));
+    output.push_back(DDSInfo::PrintDXGIFormatFlagNames(dx10_impl.dxgi_format));
+    output.push_back(DDSInfo::PrintResourceDimensionFlagNames(dx10_impl.resource_dimension));
     output.push_back(std::to_string(dx10_impl.array_size));
-    output.push_back(std::to_string(dx10_impl.misc_flags));
-    output.push_back(std::to_string(dx10_impl.misc_flags_2));
+    output.push_back(DDSInfo::PrintTexMiscFlagNames(dx10_impl.misc_flags));
+    output.push_back(DDSInfo::PrintTexMisc2FlagNames(dx10_impl.misc_flags_2));
     return output;
     }
   virtual std::string ToString() {
