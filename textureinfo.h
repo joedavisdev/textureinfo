@@ -30,6 +30,11 @@
   + (static_cast<std::uint32_t>(C2__) << 16) \
   + (static_cast<std::uint32_t>(C3__) << 24)
 
+static void RemoveTrailingCharacter(std::string& string, const char character) {
+  const unsigned int end_index(string.size()-1);
+  if(string.at(end_index)==character) string.erase(end_index);
+}
+
 //*-------------------------------
 // Constants
 //-------------------------------*/
@@ -84,6 +89,7 @@ namespace PvrLegacyInfo {
     #define X(a,b) ENUM_APPEND_TO_STRING(a,flag_names)
     #include "defs/pvrLegacy/flags.def"
     #undef X
+    RemoveTrailingCharacter(output,'|');
     return output;
   };
   const std::uint32_t kPixelTypeMask = 0xff;
@@ -548,6 +554,7 @@ namespace DDSInfo {
     #define X(a,b) ENUM_APPEND_TO_STRING(a,pixel_format_flag_names)
     #include "defs/dds/pixel_format_flags.def"
     #undef X
+    RemoveTrailingCharacter(output,'|');
     return output;
   };
   std::string PrintDDSFlagNames(unsigned int flags) {
@@ -555,6 +562,7 @@ namespace DDSInfo {
     #define X(a,b) ENUM_APPEND_TO_STRING(a,dds_flag_names)
     #include "defs/dds/dds_flags.def"
     #undef X
+    RemoveTrailingCharacter(output,'|');
     return output;
   };
   
@@ -616,10 +624,10 @@ public:
     output.push_back(DDSInfo::PrintPixelFormatFlagNames(impl.pixel_format.flags));
     output.push_back(std::to_string(impl.pixel_format.fourcc));
     output.push_back(std::to_string(impl.pixel_format.bit_count));
-    output.push_back(std::to_string(impl.pixel_format.red_mask));
-    output.push_back(std::to_string(impl.pixel_format.blue_mask));
-    output.push_back(std::to_string(impl.pixel_format.green_mask));
-    output.push_back(std::to_string(impl.pixel_format.alpha_mask));
+    output.push_back(impl.pixel_format.red_mask==0?"False":"True");
+    output.push_back(impl.pixel_format.blue_mask==0?"False":"True");
+    output.push_back(impl.pixel_format.green_mask==0?"False":"True");
+    output.push_back(impl.pixel_format.alpha_mask==0?"False":"True");
     output.push_back(std::to_string(impl.size));
     output.push_back(DDSInfo::PrintDDSFlagNames(impl.flags));
     output.push_back(std::to_string(impl.width));
@@ -635,6 +643,7 @@ public:
     for(auto& value: impl.reserved) {
       reserved.append(std::to_string(value) + ':');
     }
+    RemoveTrailingCharacter(reserved,':');
     output.push_back(reserved);
     output.push_back(std::to_string(impl.reserved2));
     // DX 10
