@@ -1,0 +1,8 @@
+X(e_cubeMap,=0x00000200)
+X(e_cubeMapPositiveX,=0x00000400)
+X(e_cubeMapNegativeX,=0x00000800)
+X(e_cubeMapPositiveY,=0x00001000)
+X(e_cubeMapNegativeY,=0x00002000)
+X(e_cubeMapPositiveZ,=0x00004000)
+X(e_cubeMapNegativeZ,=0x00008000)
+X(e_volume,=0x00200000)

@@ -12,22 +12,25 @@
 //*-------------------------------
 // Global variables
 //-------------------------------*/
-static const std::string s_version = "1.1.1";
+static const std::string s_version = "1.2";
 namespace Defaults {
   enum Types {
     PVRV3,
     PVRLegacy,
-    KTX
+    KTX,
+    DDS
   };
-  const std::vector<std::string> kTypeNames {
+  const std::vector<std::string> kContainerNames {
     "PVR (v3)",
     "PVR (legacy)",
-    "KTX"
+    "KTX",
+    "DDS"
   };
   const std::vector<std::string> kCsvNames {
   "pvrV3.csv",
   "pvrLegacy.csv",
-  "ktx.csv"
+  "ktx.csv",
+  "dds.csv"
   };
 };
 static struct Parameters {
@@ -64,15 +67,13 @@ static void PrintHeaderInfo(
   std::cout << header_info << std::endl;
 }
 static void PrintHelp() {
-  const std::vector<std::string> supported_containers
-  {"PVR (v1)","PVR (v2)","PVR (v3)","KTX"};
   std::cout << "version: " << s_version <<std::endl;
   std::cout << "usage: textureinfo ";
   for(const auto&parameter:ParameterInfo)
     std::cout << "[" << std::get<0>(parameter) << "] ";
   std::cout << "..." << std::endl << std::endl;
   std::cout << "Print a texture container's header information to stdout. Supported containers:" << std::endl;
-  for(const auto& container:supported_containers)
+  for(const auto& container:Defaults::kContainerNames)
       std::cout << "\t* " << container << std::endl;
   std::cout << std::endl;
   std::cout << "options:" << std::endl;
@@ -85,7 +86,7 @@ static void PrintHelp() {
 // main
 //-------------------------------*/
 int main (int argc, char *argv[]) {
-  std::vector<std::string> pvr_files, ktx_files;
+  std::vector<std::string> pvr_files, ktx_files, dds_files;
   //*-------------------------------
   // Loop through args
   //-------------------------------*/
@@ -113,6 +114,9 @@ int main (int argc, char *argv[]) {
     else if(ext_name == "ktx") {
       ktx_files.push_back(std::move(file_name));
     }
+    else if(ext_name == "dds") {
+      dds_files.push_back(std::move(file_name));
+    }
   }
   //*-------------------------------
   // CSV setup
@@ -136,6 +140,9 @@ int main (int argc, char *argv[]) {
           break;
         case Defaults::Types::KTX:
           column_titles = KTXInfo::column_names;
+          break;
+          case Defaults::Types::DDS:
+          column_titles = DDSInfo::column_names;
           break;
         default:
           assert(0);
@@ -202,8 +209,29 @@ int main (int argc, char *argv[]) {
     else
       PrintHeaderInfo(
         file_name,
-        Defaults::kTypeNames.at(Defaults::Types::KTX),
+        Defaults::kContainerNames.at(Defaults::Types::KTX),
         ktx_header.ToString());
+  }
+  // DDS files
+  for(const auto& file_name: dds_files) {
+    std::ifstream file(file_name, std::ifstream::binary);
+    if(!file.is_open()) {
+      printf("ERROR: Unable to open %s\n", file_name.c_str());
+      continue;
+    }
+    DDSHeader header;
+    if(!header.LoadHeader(file, error_string)) {
+      printf("ERROR: %s - %s\n",file_name.c_str(), error_string.c_str());
+        continue;
+    }
+    // Print
+    if(s_parameters.print_csv)
+      output_streams.at(Defaults::Types::DDS) << file_name << "," << header.ToCsvString() << std::endl;
+    else
+      PrintHeaderInfo(
+        file_name,
+        Defaults::kContainerNames.at(Defaults::Types::DDS),
+        header.ToString());
   }
   
   // Shutdown

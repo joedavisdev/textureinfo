@@ -20,10 +20,37 @@
 
 #define ENUM_DEF(enum__, value__) enum__ value__,
 #define ENUM_STRING_PAIR(enum__) {enum__,#enum__},
-#define ENUM_APPEND_TO_STRING(enum__) \
-  if(flags&enum__) output.append(flag_names.find(enum__)->second + "|");
+#define ENUM_APPEND_TO_STRING(enum__,string_vector__) \
+  if(flags&enum__) output.append(string_vector__.find(enum__)->second + "|");
 #define ENUM_STRING_LOOKUP(vector__,enum__) \
   vector__.find(enum__)->second == ""?std::to_string(enum__)+" (no string found)":vector__.find(enum__)->second
+
+//*-------------------------------
+// Global functions
+//-------------------------------*/
+static void RemoveTrailingCharacter(std::string& string, const char character) {
+  if(string.size()==0) return;
+  const unsigned int end_index(string.size()-1);
+  if(string.at(end_index)==character) string.erase(end_index);
+}
+constexpr static unsigned int MakeFourCC(const char c0,const char c1,const char c2,const char c3) {
+  return
+    (static_cast<std::uint32_t>(c0))
+  + (static_cast<std::uint32_t>(c1) << 8)
+  + (static_cast<std::uint32_t>(c2) << 16)
+  + (static_cast<std::uint32_t>(c3) << 24);
+}
+static std::string FourCCToString(const unsigned int fourcc) {
+  std::string output;
+  char chars[4];
+  chars[0] = static_cast<std::uint8_t>(fourcc);
+  chars[1] = static_cast<std::uint8_t>(fourcc>>8);
+  chars[2] = static_cast<std::uint8_t>(fourcc>>16);
+  chars[3] = static_cast<std::uint8_t>(fourcc>>24);
+  for(auto& character:chars)
+    output.append((char*)&character,1);
+  return output;
+}
 
 //*-------------------------------
 // Constants
@@ -76,9 +103,10 @@ namespace PvrLegacyInfo {
   };
   std::string PrintFlagNames(unsigned int flags) {
     std::string output;
-    #define X(a,b) ENUM_APPEND_TO_STRING(a)
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,flag_names)
     #include "defs/pvrLegacy/flags.def"
     #undef X
+    RemoveTrailingCharacter(output,'|');
     return output;
   };
   const std::uint32_t kPixelTypeMask = 0xff;
@@ -445,4 +473,309 @@ private:
     std::uint32_t bytes_of_key_value_data;
     Impl() {memset(this, 0, sizeof(Impl));}
   }impl_;
+};
+
+namespace DDSInfo {
+  enum PixelFormatFlags {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/pixel_format_flags.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> pixel_format_flag_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/pixel_format_flags.def"
+    #undef X
+  };
+  enum DDSFlags {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/dds_flags.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> dds_flag_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/dds_flags.def"
+    #undef X
+  };
+  enum Capabilities1Flags {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/caps_1_flags.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> capabilities1_flag_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/caps_1_flags.def"
+    #undef X
+  };
+  enum Capabilities2Flags {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/caps_2_flags.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> capabilities2_flag_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/caps_2_flags.def"
+    #undef X
+  };
+  enum TextureDimension {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/texture_dimension.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> resource_dimension_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/texture_dimension.def"
+    #undef X
+  };
+  enum TextureMiscFlags {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/texture_misc_flags.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> texture_misc_flag_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/texture_misc_flags.def"
+    #undef X
+  };
+  enum TextureMiscFlags2 {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/texture_misc_flags_2.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> texture_misc_flag_2_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/texture_misc_flags_2.def"
+    #undef X
+  };
+  enum D3DFormat {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/d3d_formats.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> d3d_format_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/d3d_formats.def"
+    #undef X
+  };
+  enum DXGIFormat {
+    #define X(a,b) ENUM_DEF(a,b)
+    #include "defs/dds/dxgi_format.def"
+    #undef X
+  };
+  std::multimap<unsigned int,std::string> dxgi_format_names {
+    #define X(a,b) ENUM_STRING_PAIR(a)
+    #include "defs/dds/dxgi_format.def"
+    #undef X
+  };
+  std::string PrintPixelFormatFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,pixel_format_flag_names)
+    #include "defs/dds/pixel_format_flags.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  };
+  std::string PrintDDSFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,dds_flag_names)
+    #include "defs/dds/dds_flags.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  };
+  std::string PrintCaps1FlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,capabilities1_flag_names)
+    #include "defs/dds/caps_1_flags.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintCaps2FlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,capabilities2_flag_names)
+    #include "defs/dds/caps_2_flags.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintD3DFormatFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,d3d_format_names)
+    #include "defs/dds/d3d_formats.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintDXGIFormatFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,dxgi_format_names)
+    #include "defs/dds/dxgi_format.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintResourceDimensionFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,resource_dimension_names)
+    #include "defs/dds/texture_dimension.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintTexMiscFlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,texture_misc_flag_names)
+    #include "defs/dds/texture_misc_flags.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  std::string PrintTexMisc2FlagNames(unsigned int flags) {
+    std::string output;
+    #define X(a,b) ENUM_APPEND_TO_STRING(a,texture_misc_flag_2_names)
+    #include "defs/dds/texture_misc_flags_2.def"
+    #undef X
+    RemoveTrailingCharacter(output,'|');
+    return output;
+  }
+  
+  static const std::uint32_t kExpectedPixelFormatSize = 32;
+  static const std::uint32_t kIdentifier = 0x20534444; // "DDS "
+  static const std::uint32_t kExpectedDDSSize = 124;
+  
+  std::vector<std::string> column_names {
+  "Pixel format (size)",
+  "Pixel format (flags)",
+  "Pixel format (fourcc)",
+  "Pixel format (bit count)",
+  "Pixel format (red mask)",
+  "Pixel format (blue mask)",
+  "Pixel format (green mask)",
+  "Pixel format (alpha mask)",
+  "Size",
+  "Flags",
+  "Width",
+  "Height",
+  "Depth",
+  "Number of MIP maps",
+  "Pitch or linear size",
+  "Capabilities (1)",
+  "Capabilities (2)",
+  "Capabilities (3)",
+  "Capabilities (4)",
+  "Reserved",
+  "Reserved (2)",
+  "DX10: Format",
+  "DX10: Dimension",
+  "DX10: Array size",
+  "DX10: Flags (1)",
+  "DX10: Flags (2)"
+  };
+}
+class DDSHeader: public IHeader {
+public:
+  virtual bool LoadHeader(std::ifstream& file, std::string& error_string) {
+    HEADER_PRE_LOAD(file)
+    std::uint32_t identifier;
+    file.read(reinterpret_cast<char*>(&identifier), sizeof(identifier));
+    if(identifier != DDSInfo::kIdentifier) {
+      error_string = "Header does not contain a valid DDS identifier";
+      return false;
+    }
+    bool has_dx10_header = (impl_.pixel_format.flags & DDSInfo::e_fourCC) &&
+	                     impl_.pixel_format.fourcc == MakeFourCC('D', 'X', '1', '0');
+    if(has_dx10_header)
+      file.read(reinterpret_cast<char*>(&this->dx10_impl_), sizeof(this->dx10_impl_));
+    file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
+    HEADER_POST_LOAD(file)
+  }
+  std::vector<std::string> ToStringArray() {
+    std::vector<std::string> output;
+    const auto& impl(this->impl_);
+    const auto& dx10_impl(this->dx10_impl_);
+    output.push_back(std::to_string(impl.pixel_format.size));
+    output.push_back(DDSInfo::PrintPixelFormatFlagNames(impl.pixel_format.flags));
+    output.push_back(FourCCToString(impl.pixel_format.fourcc));
+    output.push_back(std::to_string(impl.pixel_format.bit_count));
+    output.push_back(impl.pixel_format.red_mask==0?"False":"True");
+    output.push_back(impl.pixel_format.blue_mask==0?"False":"True");
+    output.push_back(impl.pixel_format.green_mask==0?"False":"True");
+    output.push_back(impl.pixel_format.alpha_mask==0?"False":"True");
+    output.push_back(std::to_string(impl.size));
+    output.push_back(DDSInfo::PrintDDSFlagNames(impl.flags));
+    output.push_back(std::to_string(impl.width));
+    output.push_back(std::to_string(impl.height));
+    output.push_back(std::to_string(impl.depth));
+    output.push_back(std::to_string(impl.mip_map_count));
+    output.push_back(std::to_string(impl.pitch_or_linear_size));
+    output.push_back(DDSInfo::PrintCaps1FlagNames(impl.capabilities1));
+    output.push_back(DDSInfo::PrintCaps2FlagNames(impl.capabilities2));
+    output.push_back(std::to_string(impl.capabilities3));
+    output.push_back(std::to_string(impl.capabilities4));
+    std::string reserved;
+    for(auto& value: impl.reserved) {
+      reserved.append(std::to_string(value) + ':');
+    }
+    RemoveTrailingCharacter(reserved,':');
+    output.push_back(reserved);
+    output.push_back(std::to_string(impl.reserved2));
+    // DX 10
+    output.push_back(DDSInfo::PrintDXGIFormatFlagNames(dx10_impl.dxgi_format));
+    output.push_back(DDSInfo::PrintResourceDimensionFlagNames(dx10_impl.resource_dimension));
+    output.push_back(std::to_string(dx10_impl.array_size));
+    output.push_back(DDSInfo::PrintTexMiscFlagNames(dx10_impl.misc_flags));
+    output.push_back(DDSInfo::PrintTexMisc2FlagNames(dx10_impl.misc_flags_2));
+    return output;
+    }
+  virtual std::string ToString() {
+    std::string output("");
+    const auto& variable_strings(this->ToStringArray());
+    for(unsigned int index=0; index<DDSInfo::column_names.size();++index)
+      output.append(DDSInfo::column_names.at(index) + ": " + variable_strings.at(index) + "\n");
+    return output;
+  }
+  virtual std::string ToCsvString() {
+    std::string output("");
+    const auto& variable_strings(this->ToStringArray());
+    for(const auto& variable_string:variable_strings)
+      output.append(variable_string + ',');
+    return output;
+  }
+public:
+private:
+  struct PixelFormat {
+    std::uint32_t size;
+    std::uint32_t flags;
+    std::uint32_t fourcc;
+    std::uint32_t bit_count;
+    std::uint32_t red_mask;
+    std::uint32_t green_mask;
+    std::uint32_t blue_mask;
+    std::uint32_t alpha_mask;
+  };
+  #pragma pack(4)
+  struct Impl {
+    std::uint32_t size;
+    std::uint32_t flags;
+    std::uint32_t height;
+    std::uint32_t width;
+    std::uint32_t pitch_or_linear_size;
+    std::uint32_t depth;
+    std::uint32_t mip_map_count;
+    std::uint32_t reserved[11];
+    PixelFormat   pixel_format;
+    std::uint32_t capabilities1;
+    std::uint32_t capabilities2;
+    std::uint32_t capabilities3;
+    std::uint32_t capabilities4;
+    std::uint32_t reserved2;
+  }impl_;
+  #pragma pack(4)
+  struct FileHeaderDX10 {
+    std::uint32_t dxgi_format;
+    std::uint32_t resource_dimension;
+    std::uint32_t misc_flags;
+    std::uint32_t array_size;
+    std::uint32_t misc_flags_2;
+  }dx10_impl_;
 };

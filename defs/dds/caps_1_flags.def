@@ -1,0 +1,3 @@
+X(e_complex,=0x00000008)
+X(e_texture,=0x00001000)
+X(e_mipMaps,=0x00400000)
