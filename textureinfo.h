@@ -24,16 +24,32 @@
   if(flags&enum__) output.append(string_vector__.find(enum__)->second + "|");
 #define ENUM_STRING_LOOKUP(vector__,enum__) \
   vector__.find(enum__)->second == ""?std::to_string(enum__)+" (no string found)":vector__.find(enum__)->second
-#define MAKEFOURCC(C0__,C1__,C2__,C3__) \
-  (static_cast<std::uint32_t>(C0__)) \
-  + (static_cast<std::uint32_t>(C1__) << 8) \
-  + (static_cast<std::uint32_t>(C2__) << 16) \
-  + (static_cast<std::uint32_t>(C3__) << 24)
 
+//*-------------------------------
+// Global functions
+//-------------------------------*/
 static void RemoveTrailingCharacter(std::string& string, const char character) {
   if(string.size()==0) return;
   const unsigned int end_index(string.size()-1);
   if(string.at(end_index)==character) string.erase(end_index);
+}
+constexpr static unsigned int MakeFourCC(const char c0,const char c1,const char c2,const char c3) {
+  return
+    (static_cast<std::uint32_t>(c0))
+  + (static_cast<std::uint32_t>(c1) << 8)
+  + (static_cast<std::uint32_t>(c2) << 16)
+  + (static_cast<std::uint32_t>(c3) << 24);
+}
+static std::string FourCCToString(const unsigned int fourcc) {
+  std::string output;
+  char chars[4];
+  chars[0] = static_cast<std::uint8_t>(fourcc);
+  chars[1] = static_cast<std::uint8_t>(fourcc>>8);
+  chars[2] = static_cast<std::uint8_t>(fourcc>>16);
+  chars[3] = static_cast<std::uint8_t>(fourcc>>24);
+  for(auto& character:chars)
+    output.append((char*)&character,1);
+  return output;
 }
 
 //*-------------------------------
@@ -667,7 +683,7 @@ public:
       return false;
     }
     bool has_dx10_header = (impl_.pixel_format.flags & DDSInfo::e_fourCC) &&
-	                     impl_.pixel_format.fourcc == MAKEFOURCC('D', 'X', '1', '0');
+	                     impl_.pixel_format.fourcc == MakeFourCC('D', 'X', '1', '0');
     if(has_dx10_header)
       file.read(reinterpret_cast<char*>(&this->dx10_impl_), sizeof(this->dx10_impl_));
     file.read(reinterpret_cast<char*>(&this->impl_), sizeof(this->impl_));
@@ -679,7 +695,7 @@ public:
     const auto& dx10_impl(this->dx10_impl_);
     output.push_back(std::to_string(impl.pixel_format.size));
     output.push_back(DDSInfo::PrintPixelFormatFlagNames(impl.pixel_format.flags));
-    output.push_back(std::to_string(impl.pixel_format.fourcc));
+    output.push_back(FourCCToString(impl.pixel_format.fourcc));
     output.push_back(std::to_string(impl.pixel_format.bit_count));
     output.push_back(impl.pixel_format.red_mask==0?"False":"True");
     output.push_back(impl.pixel_format.blue_mask==0?"False":"True");
